@@ -3,7 +3,7 @@
         "id": "5e16a52bec253e51",
         "type": "tab",
         "label": "Flow 2",
-        "disabled": false,
+        "disabled": true,
         "info": "",
         "env": []
     },
@@ -11,7 +11,7 @@
         "id": "427c0b64ee6ac87e",
         "type": "tab",
         "label": "Alertas + Control LED",
-        "disabled": true
+        "disabled": false
     },
     {
         "id": "367352e091ce6828",
@@ -766,8 +766,7 @@
                 "n10031"
             ],
             [
-                "n10029",
-                "1e2a85f3a05f3c9f"
+                "n10029"
             ]
         ]
     },
@@ -839,8 +838,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 910,
-        "y": 1100,
+        "x": 790,
+        "y": 1160,
         "wires": []
     },
     {
@@ -863,8 +862,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 760,
-        "y": 1140,
+        "x": 700,
+        "y": 1220,
         "wires": []
     },
     {
@@ -887,8 +886,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 960,
-        "y": 1020,
+        "x": 920,
+        "y": 1080,
         "wires": []
     },
     {
@@ -1177,8 +1176,7 @@
         "y": 900,
         "wires": [
             [
-                "n10030",
-                "b92fd24676f0c14b"
+                "n10030"
             ]
         ]
     },
@@ -1194,11 +1192,11 @@
         "category": "topic",
         "categoryType": "msg",
         "xAxisLabel": "",
-        "xAxisProperty": "",
-        "xAxisPropertyType": "timestamp",
+        "xAxisProperty": "timestamp",
+        "xAxisPropertyType": "msg",
         "xAxisType": "time",
         "xAxisFormat": "",
-        "xAxisFormatType": "auto",
+        "xAxisFormatType": "{HH}:{mm}:{ss}",
         "xmin": "",
         "xmax": "",
         "yAxisLabel": "",
@@ -1282,8 +1280,7 @@
         "y": 900,
         "wires": [
             [
-                "n10031",
-                "37e98b57d6c9b373"
+                "n10031"
             ]
         ]
     },
@@ -1312,9 +1309,7 @@
         "x": 1150,
         "y": 900,
         "wires": [
-            [
-                "b0c692ae3c944911"
-            ]
+            []
         ]
     },
     {
@@ -1329,8 +1324,7 @@
         "y": 1020,
         "wires": [
             [
-                "n10034",
-                "d881b6c13fa6bd76"
+                "n10034"
             ]
         ]
     },
@@ -1356,22 +1350,6 @@
         "valueType": "msg",
         "x": 1000,
         "y": 750,
-        "wires": []
-    },
-    {
-        "id": "d881b6c13fa6bd76",
-        "type": "debug",
-        "z": "5e16a52bec253e51",
-        "name": "debug 1",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1700,
-        "y": 1080,
         "wires": []
     },
     {
@@ -1418,70 +1396,6 @@
         ]
     },
     {
-        "id": "b92fd24676f0c14b",
-        "type": "debug",
-        "z": "5e16a52bec253e51",
-        "name": "debug 2",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1230,
-        "y": 720,
-        "wires": []
-    },
-    {
-        "id": "1e2a85f3a05f3c9f",
-        "type": "debug",
-        "z": "5e16a52bec253e51",
-        "name": "debug 3",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1020,
-        "y": 700,
-        "wires": []
-    },
-    {
-        "id": "b0c692ae3c944911",
-        "type": "debug",
-        "z": "5e16a52bec253e51",
-        "name": "debug 7",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1390,
-        "y": 760,
-        "wires": []
-    },
-    {
-        "id": "37e98b57d6c9b373",
-        "type": "debug",
-        "z": "5e16a52bec253e51",
-        "name": "debug 8",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 1750,
-        "y": 980,
-        "wires": []
-    },
-    {
         "id": "d5da22932669dbbd",
         "type": "inject",
         "z": "5e16a52bec253e51",
@@ -1511,78 +1425,292 @@
         ]
     },
     {
-        "id": "e46f1f74892fd7ee",
+        "id": "6662112fe06468b7",
+        "type": "telegram sender",
+        "z": "427c0b64ee6ac87e",
+        "name": "Enviar a Telegram",
+        "bot": "bot.telegram",
+        "haserroroutput": true,
+        "outputs": 2,
+        "x": 970,
+        "y": 280,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "743fcf51a1119d49",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "Capturar cada 2s",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 380,
+        "y": 220,
+        "wires": [
+            [
+                "9d78e3d7b9415806"
+            ]
+        ]
+    },
+    {
+        "id": "9d78e3d7b9415806",
+        "type": "http request",
+        "z": "427c0b64ee6ac87e",
+        "name": "GET /capture",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://192.168.1.9/capture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 220,
+        "wires": [
+            [
+                "03a830fe843d99d2",
+                "c8f19778038419b0"
+            ]
+        ]
+    },
+    {
+        "id": "03a830fe843d99d2",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Buffer a Base64 JSON",
+        "func": "// La API nueva espera un JSON con la imagen en base64\nlet base64Image = msg.payload.toString('base64');\n\nmsg.payload = {\n    \"image\": base64Image\n};\n\n// Asegurar que enviamos JSON\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 220,
+        "wires": [
+            [
+                "6c5e48d237852a15"
+            ]
+        ]
+    },
+    {
+        "id": "6c5e48d237852a15",
+        "type": "http request",
+        "z": "427c0b64ee6ac87e",
+        "name": "POST /recognize",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-ia:5000/recognize",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 990,
+        "y": 220,
+        "wires": [
+            [
+                "9d4dd51d7b55aefd"
+            ]
+        ]
+    },
+    {
+        "id": "9d4dd51d7b55aefd",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Evaluar Rostros",
+        "func": "let msg1 = null; // Alerta MQTT\nlet msg3 = { payload: \"\" }; // Texto Dashboard\n\n// Revisar si la API respondió correctamente y trajo rostros\nif (msg.payload && msg.payload.success && msg.payload.rostros && msg.payload.rostros.length > 0) {\n    \n    // Tomar el rostro principal de la lista\n    let rostro = msg.payload.rostros[0]; \n    \n    if (rostro.reconocido) {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"persona_identificada\",\n            \"identidad\": rostro.nombre,\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"🚨 Detectado: \" + rostro.nombre.toUpperCase();\n    } else {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"intruso_detectado\",\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"⚠️ INTRUSO DESCONOCIDO\";\n    }\n} else {\n    // Si no hay rostros o dio error por foto vacía\n    msg3.payload = \"✅ Sin rostros / Escaneando...\";\n}\n\nreturn [msg1, msg3];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 220,
+        "wires": [
+            [
+                "8d70dee44b71d8fb"
+            ],
+            [
+                "43abd1425f91bd87"
+            ]
+        ]
+    },
+    {
+        "id": "8d70dee44b71d8fb",
+        "type": "mqtt out",
+        "z": "427c0b64ee6ac87e",
+        "name": "Publicar Alerta MQTT",
+        "topic": "smarthome/equipo1/camara/evento",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "367352e091ce6828",
+        "x": 1440,
+        "y": 220,
+        "wires": []
+    },
+    {
+        "id": "43abd1425f91bd87",
+        "type": "ui-text",
+        "z": "427c0b64ee6ac87e",
+        "group": "ef630c160cd745d4",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Info",
+        "label": "Info",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1430,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "6f914f62599e3c19",
+        "type": "mqtt in",
+        "z": "427c0b64ee6ac87e",
+        "name": "Escuchar Eventos Cámara",
+        "topic": "smarthome/equipo1/camara/evento",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 410,
+        "y": 280,
+        "wires": [
+            [
+                "ee3732ace85cf1e1"
+            ]
+        ]
+    },
+    {
+        "id": "ee3732ace85cf1e1",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Formatear para Telegram",
+        "func": "const data = msg.payload;\n\n// Revisamos si viene la alerta desde MQTT\nif (data && data.alerta) {\n    let mensaje = \"\";\n    \n    // Armamos el texto según el tipo de alerta\n    if (data.alerta === \"persona_identificada\") {\n        mensaje = \"📷 Ingreso detectado: \" + data.identidad.toUpperCase();\n    } else if (data.alerta === \"intruso_detectado\") {\n        mensaje = \"🚨 ALERTA: Intruso desconocido en la cámara.\";\n    }\n\n    // Si hay mensaje, le damos el formato que exige el nodo de Telegram\n    if (mensaje !== \"\") {\n        msg.payload = {\n            chatId: 1138232122,\n            type: \"message\",\n            content: mensaje\n        };\n        return msg;\n    }\n}\n\n// Si no hay alerta que nos interese, no hace nada\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 280,
+        "wires": [
+            [
+                "6662112fe06468b7"
+            ]
+        ]
+    },
+    {
+        "id": "fd28b09252bd7665",
         "type": "mqtt in",
         "z": "427c0b64ee6ac87e",
         "name": "Sensores MKR1000",
         "topic": "smarthome/equipo2/alerta",
         "qos": "2",
-        "datatype": "utf8",
-        "broker": "broker.local",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "nl": false,
+        "rap": false,
         "inputs": 0,
-        "x": 140,
-        "y": 120,
+        "x": 400,
+        "y": 420,
         "wires": [
             [
-                "fb2b8ff28e1263ba"
+                "9bdaa77bfdd80ee0"
             ]
         ]
     },
     {
-        "id": "fb2b8ff28e1263ba",
+        "id": "9bdaa77bfdd80ee0",
         "type": "json",
         "z": "427c0b64ee6ac87e",
         "name": "Parsear JSON",
         "property": "payload",
         "action": "obj",
         "pretty": false,
-        "x": 320,
-        "y": 120,
+        "x": 630,
+        "y": 420,
         "wires": [
             [
-                "a99506e19d4aad4e",
-                "66e879e662da8e2f"
+                "9ab496d3ab7e4841"
             ]
         ]
     },
     {
-        "id": "a99506e19d4aad4e",
+        "id": "9ab496d3ab7e4841",
         "type": "function",
         "z": "427c0b64ee6ac87e",
         "name": "Verificar umbrales",
-        "func": "const d = msg.payload;\nconst cooldown = 2000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 20) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 100) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 80) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
+        "func": "const d = msg.payload;\nconst cooldown = 30000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 20) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 100) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 80) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 510,
-        "y": 120,
+        "x": 910,
+        "y": 420,
         "wires": [
             [
-                "641588c348200e9b",
-                "c96ac5a9aff218c0"
+                "4b1da990d29b6b49"
             ]
         ]
     },
     {
-        "id": "641588c348200e9b",
+        "id": "4b1da990d29b6b49",
         "type": "telegram sender",
         "z": "427c0b64ee6ac87e",
         "name": "Enviar alerta",
         "bot": "bot.telegram",
-        "outputs": 1,
-        "x": 710,
-        "y": 120,
+        "haserroroutput": true,
+        "outputs": 2,
+        "x": 1200,
+        "y": 420,
         "wires": [
-            [
-                "67309473b0d05bd1"
-            ]
+            [],
+            []
         ]
     },
     {
-        "id": "135bff6490734fe8",
+        "id": "5bade891a99aee0c",
         "type": "telegram command",
         "z": "427c0b64ee6ac87e",
         "name": "Comando /led",
@@ -1592,153 +1720,1074 @@
         "hasresponse": false,
         "useregex": false,
         "outputs": 2,
-        "x": 130,
-        "y": 280,
+        "x": 540,
+        "y": 500,
         "wires": [
             [
-                "a244db115a69c0ab"
+                "5bfadef557fa50df"
             ],
             []
         ]
     },
     {
-        "id": "a244db115a69c0ab",
+        "id": "5bfadef557fa50df",
         "type": "function",
         "z": "427c0b64ee6ac87e",
         "name": "Mapear comando LED",
-        "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, {\n        payload: { chatId: chatId, type: 'message', content: '❌ Usá: /led ON, /led OFF o /led TOGGLE' }\n    }];\n}\n\nreturn [\n    { payload: accion },                                        // Output 1 → MQTT\n    { payload: { chatId: chatId, type: 'message', content: '✅ LED ' + accion } }  // Output 2 → Telegram\n];",
+        "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, { payload: '❌ Usá: /led ON, /led OFF o /led TOGGLE', chatId: chatId }];\n}\n\nreturn [\n    { payload: accion },                    // Output 1 → MQTT\n    { payload: '✅ LED ' + accion, chatId: chatId }  // Output 2 → Telegram\n];",
         "outputs": 2,
         "noerr": 0,
-        "x": 350,
-        "y": 280,
+        "x": 760,
+        "y": 500,
         "wires": [
             [
-                "872d075bc1fc910e"
+                "e6b6ca4950c1dbea"
             ],
             [
-                "db098d3c7492f41e"
+                "14a1079ad808f055"
             ]
         ]
     },
     {
-        "id": "872d075bc1fc910e",
+        "id": "e6b6ca4950c1dbea",
         "type": "mqtt out",
         "z": "427c0b64ee6ac87e",
         "name": "Publicar comando",
         "topic": "smarthome/equipo2/control/led",
         "qos": "1",
         "retain": false,
-        "broker": "broker.local",
-        "x": 570,
-        "y": 260,
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "367352e091ce6828",
+        "x": 980,
+        "y": 480,
         "wires": []
     },
     {
-        "id": "db098d3c7492f41e",
+        "id": "14a1079ad808f055",
         "type": "telegram sender",
         "z": "427c0b64ee6ac87e",
         "name": "Confirmar comando",
         "bot": "bot.telegram",
         "outputs": 1,
-        "x": 570,
-        "y": 310,
+        "x": 980,
+        "y": 530,
         "wires": [
             []
         ]
     },
     {
-        "id": "ceb08bc9d9b99abb",
+        "id": "e9e51a2246cbe4ac",
         "type": "mqtt in",
         "z": "427c0b64ee6ac87e",
         "name": "Estado del LED",
         "topic": "smarthome/equipo2/led/state",
         "qos": "2",
         "datatype": "auto-detect",
-        "broker": "broker.local",
+        "broker": "367352e091ce6828",
+        "nl": false,
+        "rap": false,
         "inputs": 0,
-        "x": 140,
-        "y": 400,
+        "x": 240,
+        "y": 680,
         "wires": [
             [
-                "fb8f3442063b4d9b"
+                "34f885edf16d9776"
             ]
         ]
     },
     {
-        "id": "fb8f3442063b4d9b",
+        "id": "34f885edf16d9776",
         "type": "function",
         "z": "427c0b64ee6ac87e",
         "name": "Notificar estado LED",
-        "func": "const estado = String(msg.payload).toUpperCase();\nconst icono = estado === 'ON' ? '🟢' : '🔴';\nmsg.payload = {\n    chatId: '1138232122',\n    type: 'message',\n    content: icono + ' LED ' + (estado === 'ON' ? 'ENCENDIDO' : 'APAGADO')\n};\nreturn msg;",
+        "func": "const estado = String(msg.payload).toUpperCase();\nconst icono = estado === 'ON' ? '🟢' : '🔴';\nmsg.payload = icono + ' LED ' + (estado === 'ON' ? 'ENCENDIDO' : 'APAGADO');\nmsg.chatId = '1138232122';\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
-        "x": 340,
-        "y": 400,
+        "x": 440,
+        "y": 680,
         "wires": [
             [
-                "666a090fdbbd52f3"
+                "ac4014071e06d412"
             ]
         ]
     },
     {
-        "id": "666a090fdbbd52f3",
+        "id": "ac4014071e06d412",
         "type": "telegram sender",
         "z": "427c0b64ee6ac87e",
         "name": "Notificar Telegram",
         "bot": "bot.telegram",
         "outputs": 1,
-        "x": 550,
-        "y": 400,
+        "x": 650,
+        "y": 680,
         "wires": [
             []
         ]
     },
     {
-        "id": "c96ac5a9aff218c0",
-        "type": "debug",
+        "id": "d8b0aa47240a3d12",
+        "type": "mqtt in",
         "z": "427c0b64ee6ac87e",
-        "name": "debug 4",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 740,
-        "y": 200,
+        "name": "Sensores Dashboard",
+        "topic": "smarthome/equipo2/alerta",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 140,
+        "y": 840,
+        "wires": [
+            [
+                "1362d6c253439f3c"
+            ]
+        ]
+    },
+    {
+        "id": "1362d6c253439f3c",
+        "type": "json",
+        "z": "427c0b64ee6ac87e",
+        "name": "Parsear JSON Dashboard",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 410,
+        "y": 840,
+        "wires": [
+            [
+                "47a980e515bc3e0c"
+            ]
+        ]
+    },
+    {
+        "id": "47a980e515bc3e0c",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Procesar Dashboard",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\nconst data = {\n    gas: d.gas != null ? d.gas : 0,\n    distancia: d.distancia != null ? d.distancia : 0,\n    sonido: d.sonido != null ? d.sonido : 0,\n    alerta: d.alerta || \"\"\n};\ncontext.set(\"sensor_data\", data);\n// Si no hay datos, en vez de enviar null, enviamos un mensaje vacío \n// que no rompa el gráfico o simplemente no enviamos nada.\nreturn [\n    data ? { payload: data } : null,\n    data ? { payload: data, topic: \"Gas\" } : null, // <-- El truco está en agregar el topic aquí\n    data ? { payload: data } : null\n];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 840,
+        "wires": [
+            [
+                "14fbc0521581cc8c",
+                "1f612c31e715cf69",
+                "dffe1017a3623373"
+            ],
+            [
+                "bb805617eb33953f"
+            ],
+            [
+                "9ba60929d812df6a",
+                "9887d398167474d6"
+            ]
+        ]
+    },
+    {
+        "id": "14fbc0521581cc8c",
+        "type": "ui-text",
+        "z": "427c0b64ee6ac87e",
+        "group": "ef630c160cd745d4",
+        "order": 1,
+        "width": 2,
+        "height": 1,
+        "name": "Distancia",
+        "label": "Distancia",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 18,
+        "color": "#3498db",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.distancia",
+        "valueType": "msg",
+        "x": 1010,
+        "y": 760,
         "wires": []
     },
     {
-        "id": "66e879e662da8e2f",
-        "type": "debug",
+        "id": "1f612c31e715cf69",
+        "type": "ui-text",
         "z": "427c0b64ee6ac87e",
-        "name": "debug 5",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 430,
-        "y": 160,
+        "group": "ef630c160cd745d4",
+        "order": 2,
+        "width": 2,
+        "height": 1,
+        "name": "Gas",
+        "label": "Gas",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 18,
+        "color": "#f39c12",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.gas",
+        "valueType": "msg",
+        "x": 1010,
+        "y": 790,
         "wires": []
     },
     {
-        "id": "67309473b0d05bd1",
-        "type": "debug",
+        "id": "8326a6645d17bc69",
+        "type": "ui-text",
         "z": "427c0b64ee6ac87e",
-        "name": "debug 6",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "false",
-        "statusVal": "",
-        "statusType": "auto",
+        "group": "n10001",
+        "order": 0,
+        "width": 2,
+        "height": 1,
+        "name": "Movimiento",
+        "label": "Movimiento",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 20,
+        "color": "#e67e22",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 910,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "d639baf87b1edb59",
+        "type": "ui-text",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10001",
+        "order": 1,
+        "width": 2,
+        "height": 1,
+        "name": "Persona",
+        "label": "Persona Detectada",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 20,
+        "color": "#9b59b6",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 760,
+        "y": 1120,
+        "wires": []
+    },
+    {
+        "id": "a1a3a229bd12bc78",
+        "type": "ui-text",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10001",
+        "order": 2,
+        "width": 4,
+        "height": 1,
+        "name": "Alerta Sistema",
+        "label": "Alerta del Sistema",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 16,
+        "color": "#e74c3c",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 960,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "c8f19778038419b0",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Img a Dashboard",
+        "func": "if (msg.payload && msg.payload.type === \"Buffer\") {\n    const buf = Buffer.from(msg.payload.data);\n    const b64 = buf.toString(\"base64\");\n    msg.payload = \"data:image/jpeg;base64,\" + b64;\n    return msg;\n}\nif (Buffer.isBuffer(msg.payload)) {\n    const b64 = msg.payload.toString(\"base64\");\n    msg.payload = \"data:image/jpeg;base64,\" + b64;\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 100,
+        "wires": [
+            [
+                "96bf79c58c716c0f"
+            ]
+        ]
+    },
+    {
+        "id": "96bf79c58c716c0f",
+        "type": "ui-template",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10003",
+        "name": "Vista Camara",
+        "order": 0,
+        "width": 6,
+        "height": 5,
+        "storeOutMessages": true,
+        "passthru": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1000,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2da43453e30c028e",
+        "type": "trigger",
+        "z": "427c0b64ee6ac87e",
+        "name": "Trigger Captura",
+        "op1": "",
+        "op2": "",
+        "op1type": "nul",
+        "op2type": "nul",
+        "duration": 1,
+        "extend": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "",
+        "outputs": 1,
+        "x": 420,
+        "y": 140,
+        "wires": [
+            [
+                "9d78e3d7b9415806"
+            ]
+        ]
+    },
+    {
+        "id": "7e6e3e47f167dc77",
+        "type": "ui-button",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10004",
+        "name": "Capturar Manual",
+        "label": "Capturar Imagen",
+        "order": 0,
+        "width": 3,
+        "height": 2,
+        "tooltip": "Solicitar captura manual de imagen",
+        "color": "#ffffff",
+        "icon": "",
+        "payload": "",
+        "payloadType": "date",
+        "topic": "",
+        "enableClick": true,
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "2da43453e30c028e"
+            ]
+        ]
+    },
+    {
+        "id": "7875023141fe2d1d",
+        "type": "mqtt out",
+        "z": "427c0b64ee6ac87e",
+        "name": "Publicar LED Dashboard",
+        "topic": "smarthome/equipo2/control/led",
+        "qos": "1",
+        "retain": false,
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "367352e091ce6828",
+        "x": 570,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "8ebd60c3333d2ec8",
+        "type": "ui-switch",
+        "z": "427c0b64ee6ac87e",
+        "name": "Control LED",
+        "label": "Actuador LED",
+        "group": "n10004",
+        "order": 1,
+        "width": 3,
+        "height": 2,
+        "passthru": true,
+        "decouple": false,
+        "topic": "",
+        "topicType": "str",
+        "style": "default",
+        "className": "",
+        "layout": "",
+        "clickableArea": "switch",
+        "onvalue": "on",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 320,
+        "y": 600,
+        "wires": [
+            [
+                "7875023141fe2d1d"
+            ]
+        ]
+    },
+    {
+        "id": "57461dc28cfd1edd",
+        "type": "mqtt in",
+        "z": "427c0b64ee6ac87e",
+        "name": "Eventos Camara Dashboard",
+        "topic": "smarthome/equipo1/camara/evento",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 120,
+        "y": 940,
+        "wires": [
+            [
+                "bf5b5f08abe4677e"
+            ]
+        ]
+    },
+    {
+        "id": "bf5b5f08abe4677e",
+        "type": "json",
+        "z": "427c0b64ee6ac87e",
+        "name": "Parsear Evento Camara",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 390,
+        "y": 940,
+        "wires": [
+            [
+                "d571dc8c7b258bae",
+                "b2d3c902d7f66972"
+            ]
+        ]
+    },
+    {
+        "id": "d571dc8c7b258bae",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Estado del Sistema",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\ncontext.set(\"sys_state\", { movimiento: d.movimiento || false, alerta: d.alerta || \"ninguna\", identidad: d.identidad || \"\", timestamp: Date.now() });\nlet nivel = \"OK\";\nlet mensaje = \"Sistema Normal\";\nlet color = \"#2ecc71\";\nif (d.alerta === \"intruso_detectado\") { nivel = \"ALERTA\"; mensaje = \"INTRUSO DETECTADO\"; color = \"#e74c3c\"; }\nelse if (d.alerta === \"persona_identificada\") { nivel = \"WARNING\"; mensaje = \"Identificado: \" + (d.identidad || \"Desconocido\"); color = \"#f39c12\"; }\nmsg.payload = { nivel: nivel, mensaje: mensaje, color: color };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 920,
+        "wires": [
+            [
+                "a1a3a229bd12bc78",
+                "c32d7c1208ad7978"
+            ]
+        ]
+    },
+    {
+        "id": "c32d7c1208ad7978",
+        "type": "ui-template",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10002",
+        "name": "Indicador Estado",
+        "order": 0,
+        "width": 4,
+        "height": 3,
+        "templateScope": "local",
+        "className": "",
         "x": 950,
-        "y": 80,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b2d3c902d7f66972",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Actualizar Deteccion",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\nlet motion = d.movimiento ? \"Si\" : \"No\";\nlet person = \"No\";\nif (d.alerta === \"persona_identificada\") person = d.identidad || \"Si\";\nelse if (d.alerta === \"intruso_detectado\") person = \"Desconocido\";\nlet alertText = \"Sin alertas\";\nif (d.alerta === \"intruso_detectado\") alertText = \"INTRUSO detectado\";\nelse if (d.alerta === \"persona_identificada\") alertText = \"Identificado: \" + (d.identidad || \"Desconocido\");\nreturn [\n    { payload: motion },\n    { payload: person },\n    { payload: alertText }\n];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 1020,
+        "wires": [
+            [
+                "8326a6645d17bc69"
+            ],
+            [
+                "d639baf87b1edb59"
+            ],
+            [
+                "a1a3a229bd12bc78"
+            ]
+        ]
+    },
+    {
+        "id": "148411690d8e431a",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "Iniciar BD",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 1,
+        "topic": "CREATE TABLE IF NOT EXISTS sensor_history (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, sonido REAL, gas INTEGER, distancia REAL)",
+        "payload": "ready",
+        "payloadType": "str",
+        "x": 1120,
+        "y": 1200,
+        "wires": [
+            [
+                "1d2e4f828f6d2ac0"
+            ]
+        ]
+    },
+    {
+        "id": "9ba60929d812df6a",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Insertar SQLite",
+        "func": "const d = msg.payload;\n\n// Si no hay datos, no hacemos nada\nif (!d) return null;\n\n// Extraemos los valores y aseguramos que sean números (si vienen vacíos, ponemos 0)\nconst sonido = d.sonido || 0;\nconst gas = d.gas || 0;\nconst distancia = d.distancia || 0;\n\n// Armamos el texto SQL directamente con los valores (nota las comillas invertidas ` )\nmsg.topic = `INSERT INTO sensor_history (sonido, gas, distancia) VALUES (${sonido}, ${gas}, ${distancia});`;\n\n// Destruimos el payload para que el nodo SQLite solo ejecute el topic crudo\ndelete msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 880,
+        "wires": [
+            [
+                "131a02c9a013be3c",
+                "e76e989dfc0d8fe4"
+            ]
+        ]
+    },
+    {
+        "id": "bb805617eb33953f",
+        "type": "ui-chart",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10005",
+        "name": "Grafico Gas",
+        "label": "Historico Gas",
+        "order": 2,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "timestamp",
+        "xAxisPropertyType": "msg",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "{HH}:{mm}:{ss}",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "payload.gas",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": 86400,
+        "removeOlderUnit": "86400",
+        "removeOlderPoints": "",
+        "colors": [
+            "#e74c3c",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 12,
+        "height": 4,
+        "className": "",
+        "interpolation": "linear",
+        "x": 1570,
+        "y": 840,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a983a9fb69caf82c",
+        "type": "ui-dropdown",
+        "z": "427c0b64ee6ac87e",
+        "group": "n10005",
+        "name": "Selector Rango",
+        "label": "Ver datos de:",
+        "tooltip": "Filtra el rango de tiempo del gráfico",
+        "order": 1,
+        "width": 4,
+        "height": 1,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "Última Hora",
+                "value": "1h",
+                "type": "str"
+            },
+            {
+                "label": "Últimas 24 Horas",
+                "value": "24h",
+                "type": "str"
+            },
+            {
+                "label": "Histórico Completo",
+                "value": "all",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 1260,
+        "y": 1120,
+        "wires": [
+            [
+                "8fc8caee6749af6d",
+                "d3246b6774fef2c7"
+            ]
+        ]
+    },
+    {
+        "id": "8fc8caee6749af6d",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Generar SQL por Rango",
+        "func": "const rango = msg.payload;\nlet sql = \"\";\n\nif (rango === '1h') {\n    sql = \"SELECT timestamp, gas FROM sensor_history WHERE timestamp >= datetime('now', '-1 hour') ORDER BY timestamp ASC\";\n} else if (rango === '24h') {\n    sql = \"SELECT timestamp, gas FROM sensor_history WHERE timestamp >= datetime('now', '-1 day') ORDER BY timestamp ASC\";\n} else {\n    // Subconsulta para traer los últimos 200 reales y luego ordenarlos cronológicamente\n    sql = \"SELECT * FROM (SELECT timestamp, gas FROM sensor_history ORDER BY timestamp DESC LIMIT 200) ORDER BY timestamp ASC\";\n}\n\nmsg.topic = sql;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1290,
+        "y": 980,
+        "wires": [
+            [
+                "eee394b4ed03b044"
+            ]
+        ]
+    },
+    {
+        "id": "86a89de755e283ec",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "Cargar al Inicio (1h)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "1h",
+        "payloadType": "str",
+        "x": 1020,
+        "y": 1140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "fccb4dbb9abfafb0",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Formatear Historial",
+        "func": "const rows = msg.payload;\nif (!rows || !Array.isArray(rows)) return null;\n\nconst mensajes = rows.map((row, index) => {\n    let textDate = String(row.timestamp);\n\n    // Arreglamos el formato de SQLite\n    if (textDate.includes(\" \") && !textDate.includes(\"T\")) {\n        textDate = textDate.replace(\" \", \"T\") + \"Z\";\n    }\n\n    let timeMs = new Date(textDate).getTime();\n\n    if (isNaN(timeMs)) {\n        timeMs = Date.now() - ((rows.length - index) * 1000);\n    }\n\n    return {\n        topic: \"Gas\",\n        payload: row.gas,\n        timestamp: timeMs\n    };\n});\n\n// ¡LA SOLUCIÓN AQUÍ!\n// Metemos un comando de borrado (un payload vacío) al inicio de la fila de mensajes.\n// Así el gráfico se limpia instantáneamente antes de dibujar la nueva consulta.\nmensajes.unshift({ payload: [] });\n\n// Enviamos la ráfaga\nreturn [mensajes];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1490,
+        "y": 920,
+        "wires": [
+            [
+                "bb805617eb33953f",
+                "c2dab189f25f0e68"
+            ]
+        ]
+    },
+    {
+        "id": "1d2e4f828f6d2ac0",
+        "type": "sqlite",
+        "z": "427c0b64ee6ac87e",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite DB",
+        "x": 1300,
+        "y": 1200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "131a02c9a013be3c",
+        "type": "sqlite",
+        "z": "427c0b64ee6ac87e",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "Insertar Dato",
+        "x": 1150,
+        "y": 880,
+        "wires": [
+            [
+                "b4be617b75222d08"
+            ]
+        ]
+    },
+    {
+        "id": "eee394b4ed03b044",
+        "type": "sqlite",
+        "z": "427c0b64ee6ac87e",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "Consultar Historial",
+        "x": 1510,
+        "y": 980,
+        "wires": [
+            [
+                "fccb4dbb9abfafb0",
+                "4875509425932182"
+            ]
+        ]
+    },
+    {
+        "id": "dffe1017a3623373",
+        "type": "ui-text",
+        "z": "427c0b64ee6ac87e",
+        "group": "ef630c160cd745d4",
+        "order": 0,
+        "width": 2,
+        "height": 1,
+        "name": "Sonido",
+        "label": "Sonido",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 18,
+        "color": "#e74c3c",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.sonido",
+        "valueType": "msg",
+        "x": 1000,
+        "y": 730,
         "wires": []
+    },
+    {
+        "id": "4875509425932182",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1700,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "347f2b9928515a52",
+        "type": "sqlite",
+        "z": "427c0b64ee6ac87e",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite DB",
+        "x": 1390,
+        "y": 1420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d03565b8ca285509",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "Iniciar BD",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "DELETE FROM sensor_history;",
+        "x": 1150,
+        "y": 1420,
+        "wires": [
+            [
+                "347f2b9928515a52"
+            ]
+        ]
+    },
+    {
+        "id": "e76e989dfc0d8fe4",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1230,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "9887d398167474d6",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1020,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "b4be617b75222d08",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1390,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "c2dab189f25f0e68",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1750,
+        "y": 960,
+        "wires": []
+    },
+    {
+        "id": "1138c3e664eb7f81",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "Limpiar Gráfico",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "[]",
+        "payloadType": "json",
+        "x": 1580,
+        "y": 680,
+        "wires": [
+            [
+                "bb805617eb33953f"
+            ]
+        ]
+    },
+    {
+        "id": "4e79ce3c6cc10bf0",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "1h",
+        "payloadType": "str",
+        "x": 1390,
+        "y": 1280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "1af92d9ef7a6c7e8",
+        "type": "inject",
+        "z": "427c0b64ee6ac87e",
+        "name": "Consultar estado actual",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 1310,
+        "y": 1320,
+        "wires": [
+            [
+                "457521582b5aa5f1"
+            ]
+        ]
+    },
+    {
+        "id": "457521582b5aa5f1",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "function 1",
+        "func": "// Recuperamos el valor que el usuario tiene seleccionado actualmente en el dropdown\n// Suponiendo que guardamos el estado en el contexto del flow\nlet rangoActual = flow.get(\"rango_seleccionado\") || \"1h\";\n\n// Enviamos el mensaje como si el usuario hubiera elegido ese valor\nmsg.payload = rangoActual;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1600,
+        "y": 1320,
+        "wires": [
+            [
+                "8fc8caee6749af6d"
+            ]
+        ]
+    },
+    {
+        "id": "d3246b6774fef2c7",
+        "type": "change",
+        "z": "427c0b64ee6ac87e",
+        "name": "",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "rango_seleccionado",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1440,
+        "y": 1060,
+        "wires": [
+            []
+        ]
     }
 ]
