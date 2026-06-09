@@ -1,0 +1,1575 @@
+[
+    {
+        "id": "5e16a52bec253e51",
+        "type": "tab",
+        "label": "Flow 2",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "427c0b64ee6ac87e",
+        "type": "tab",
+        "label": "Alertas + Control LED",
+        "disabled": true
+    },
+    {
+        "id": "367352e091ce6828",
+        "type": "mqtt-broker",
+        "name": "MQTT-HOST-PC",
+        "broker": "172.20.10.3",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "194f68af3aa0c514",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "de87a90193a77446",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#ffffff",
+            "primary": "#0094CE",
+            "bgPage": "#eeeeee",
+            "groupBg": "#ffffff",
+            "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "c56b25868f79b38f",
+        "type": "ui-page",
+        "name": "IOT Dashboard",
+        "ui": "194f68af3aa0c514",
+        "path": "/dashboard",
+        "icon": "dashboard",
+        "layout": "grid",
+        "theme": "de87a90193a77446",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "ef630c160cd745d4",
+        "type": "ui-group",
+        "name": "Sensores",
+        "page": "c56b25868f79b38f",
+        "width": 4,
+        "height": 3,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "5d9a02eb74e831d8",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "mosquitto",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "94b3ef3010884e8d",
+        "type": "telegram bot",
+        "botname": "NotificacionIOT",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": 300,
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": 6667,
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "0.0.0.0",
+        "localbotport": 8443,
+        "publicbotport": 8443,
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "broker.local",
+        "type": "mqtt-broker",
+        "name": "Broker local",
+        "broker": "172.20.10.3",
+        "port": "1883",
+        "clientid": "node-red-alertas",
+        "autoConnect": true,
+        "usetls": false,
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "bot.telegram",
+        "type": "telegram bot",
+        "botname": "Proyecto1IOT",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "pollinterval": "",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "",
+        "socksusername": "",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "",
+        "localbotport": "",
+        "publicbotport": "",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": true
+    },
+    {
+        "id": "n10001",
+        "type": "ui-group",
+        "name": "Deteccion",
+        "page": "c56b25868f79b38f",
+        "width": 4,
+        "height": 3,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "n10002",
+        "type": "ui-group",
+        "name": "Estado del Sistema",
+        "page": "c56b25868f79b38f",
+        "width": 4,
+        "height": 3,
+        "order": 3,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "n10003",
+        "type": "ui-group",
+        "name": "Camara",
+        "page": "c56b25868f79b38f",
+        "width": 6,
+        "height": 5,
+        "order": 4,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "n10004",
+        "type": "ui-group",
+        "name": "Control",
+        "page": "c56b25868f79b38f",
+        "width": 6,
+        "height": 3,
+        "order": 5,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "n10005",
+        "type": "ui-group",
+        "name": "Historico Gas",
+        "page": "c56b25868f79b38f",
+        "width": 12,
+        "height": 4,
+        "order": 6,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "a0244ea576e1de63",
+        "type": "sqlitedb",
+        "db": "data_general",
+        "mode": "RWC"
+    },
+    {
+        "id": "f7cbde09dbdf6e68",
+        "type": "telegram sender",
+        "z": "5e16a52bec253e51",
+        "name": "Enviar a Telegram",
+        "bot": "bot.telegram",
+        "haserroroutput": true,
+        "outputs": 2,
+        "x": 970,
+        "y": 300,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "trigger_ia",
+        "type": "inject",
+        "z": "5e16a52bec253e51",
+        "name": "Capturar cada 2s",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 390,
+        "y": 240,
+        "wires": [
+            [
+                "get_foto"
+            ]
+        ]
+    },
+    {
+        "id": "get_foto",
+        "type": "http request",
+        "z": "5e16a52bec253e51",
+        "name": "GET /capture",
+        "method": "GET",
+        "ret": "bin",
+        "paytoqs": "ignore",
+        "url": "http://172.20.10.8/capture",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 570,
+        "y": 240,
+        "wires": [
+            [
+                "convertir_base64",
+                "n10016"
+            ]
+        ]
+    },
+    {
+        "id": "convertir_base64",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Buffer a Base64 JSON",
+        "func": "// La API nueva espera un JSON con la imagen en base64\nlet base64Image = msg.payload.toString('base64');\n\nmsg.payload = {\n    \"image\": base64Image\n};\n\n// Asegurar que enviamos JSON\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 240,
+        "wires": [
+            [
+                "post_api_ia"
+            ]
+        ]
+    },
+    {
+        "id": "post_api_ia",
+        "type": "http request",
+        "z": "5e16a52bec253e51",
+        "name": "POST /recognize",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-ia:5000/recognize",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 990,
+        "y": 240,
+        "wires": [
+            [
+                "func_evaluar_ia"
+            ]
+        ]
+    },
+    {
+        "id": "func_evaluar_ia",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Evaluar Rostros",
+        "func": "let msg1 = null; // Alerta MQTT\nlet msg3 = { payload: \"\" }; // Texto Dashboard\n\n// Revisar si la API respondió correctamente y trajo rostros\nif (msg.payload && msg.payload.success && msg.payload.rostros && msg.payload.rostros.length > 0) {\n    \n    // Tomar el rostro principal de la lista\n    let rostro = msg.payload.rostros[0]; \n    \n    if (rostro.reconocido) {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"persona_identificada\",\n            \"identidad\": rostro.nombre,\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"🚨 Detectado: \" + rostro.nombre.toUpperCase();\n    } else {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"intruso_detectado\",\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"⚠️ INTRUSO DESCONOCIDO\";\n    }\n} else {\n    // Si no hay rostros o dio error por foto vacía\n    msg3.payload = \"✅ Sin rostros / Escaneando...\";\n}\n\nreturn [msg1, msg3];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1180,
+        "y": 240,
+        "wires": [
+            [
+                "mqtt_out_ia"
+            ],
+            [
+                "f7cc6e66d88ce601"
+            ]
+        ]
+    },
+    {
+        "id": "mqtt_out_ia",
+        "type": "mqtt out",
+        "z": "5e16a52bec253e51",
+        "name": "Publicar Alerta MQTT",
+        "topic": "smarthome/equipo1/camara/evento",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "367352e091ce6828",
+        "x": 1440,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "f7cc6e66d88ce601",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "ef630c160cd745d4",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "name": "Info",
+        "label": "Info",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 1430,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "mqtt_in_listener",
+        "type": "mqtt in",
+        "z": "5e16a52bec253e51",
+        "name": "Escuchar Eventos Cámara",
+        "topic": "smarthome/equipo1/camara/evento",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "nl": false,
+        "rap": false,
+        "inputs": 0,
+        "x": 410,
+        "y": 300,
+        "wires": [
+            [
+                "func_formatear_telegram"
+            ]
+        ]
+    },
+    {
+        "id": "func_formatear_telegram",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Formatear para Telegram",
+        "func": "const data = msg.payload;\n\n// Revisamos si viene la alerta desde MQTT\nif (data && data.alerta) {\n    let mensaje = \"\";\n    \n    // Armamos el texto según el tipo de alerta\n    if (data.alerta === \"persona_identificada\") {\n        mensaje = \"📷 Ingreso detectado: \" + data.identidad.toUpperCase();\n    } else if (data.alerta === \"intruso_detectado\") {\n        mensaje = \"🚨 ALERTA: Intruso desconocido en la cámara.\";\n    }\n\n    // Si hay mensaje, le damos el formato que exige el nodo de Telegram\n    if (mensaje !== \"\") {\n        msg.payload = {\n            chatId: 1138232122,\n            type: \"message\",\n            content: mensaje\n        };\n        return msg;\n    }\n}\n\n// Si no hay alerta que nos interese, no hace nada\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 300,
+        "wires": [
+            [
+                "f7cbde09dbdf6e68"
+            ]
+        ]
+    },
+    {
+        "id": "4dd5db9b087477d8",
+        "type": "mqtt in",
+        "z": "5e16a52bec253e51",
+        "name": "Sensores MKR1000",
+        "topic": "smarthome/equipo2/alerta",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "broker.local",
+        "inputs": 0,
+        "x": 250,
+        "y": 380,
+        "wires": [
+            [
+                "8fbcee3567c2e624"
+            ]
+        ]
+    },
+    {
+        "id": "8fbcee3567c2e624",
+        "type": "json",
+        "z": "5e16a52bec253e51",
+        "name": "Parsear JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 480,
+        "y": 380,
+        "wires": [
+            [
+                "37b859a2043f3a3d"
+            ]
+        ]
+    },
+    {
+        "id": "37b859a2043f3a3d",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Verificar umbrales",
+        "func": "const d = msg.payload;\nconst cooldown = 30000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 20) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 100) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 80) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 380,
+        "wires": [
+            [
+                "894b48b7b4ebd6cc"
+            ]
+        ]
+    },
+    {
+        "id": "894b48b7b4ebd6cc",
+        "type": "telegram sender",
+        "z": "5e16a52bec253e51",
+        "name": "Enviar alerta",
+        "bot": "bot.telegram",
+        "haserroroutput": true,
+        "outputs": 2,
+        "x": 1050,
+        "y": 380,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "dfb145a14722ffad",
+        "type": "telegram command",
+        "z": "5e16a52bec253e51",
+        "name": "Comando /led",
+        "command": "/led",
+        "bot": "bot.telegram",
+        "strict": false,
+        "hasresponse": false,
+        "useregex": false,
+        "outputs": 2,
+        "x": 390,
+        "y": 460,
+        "wires": [
+            [
+                "dd7bc1eb34d12f6c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "dd7bc1eb34d12f6c",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Mapear comando LED",
+        "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, { payload: '❌ Usá: /led ON, /led OFF o /led TOGGLE', chatId: chatId }];\n}\n\nreturn [\n    { payload: accion },                    // Output 1 → MQTT\n    { payload: '✅ LED ' + accion, chatId: chatId }  // Output 2 → Telegram\n];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 610,
+        "y": 460,
+        "wires": [
+            [
+                "e1e4bf3239270914"
+            ],
+            [
+                "7ada31e72254fa2e"
+            ]
+        ]
+    },
+    {
+        "id": "e1e4bf3239270914",
+        "type": "mqtt out",
+        "z": "5e16a52bec253e51",
+        "name": "Publicar comando",
+        "topic": "smarthome/equipo2/control/led",
+        "qos": "1",
+        "retain": false,
+        "broker": "broker.local",
+        "x": 830,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "7ada31e72254fa2e",
+        "type": "telegram sender",
+        "z": "5e16a52bec253e51",
+        "name": "Confirmar comando",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 830,
+        "y": 490,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "09b074c7af89fd74",
+        "type": "mqtt in",
+        "z": "5e16a52bec253e51",
+        "name": "Estado del LED",
+        "topic": "smarthome/equipo2/led/state",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "broker.local",
+        "inputs": 0,
+        "x": 240,
+        "y": 700,
+        "wires": [
+            [
+                "274d846512b3a216"
+            ]
+        ]
+    },
+    {
+        "id": "274d846512b3a216",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Notificar estado LED",
+        "func": "const estado = String(msg.payload).toUpperCase();\nconst icono = estado === 'ON' ? '🟢' : '🔴';\nmsg.payload = icono + ' LED ' + (estado === 'ON' ? 'ENCENDIDO' : 'APAGADO');\nmsg.chatId = '1138232122';\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 440,
+        "y": 700,
+        "wires": [
+            [
+                "8e4b94f2db94b05f"
+            ]
+        ]
+    },
+    {
+        "id": "8e4b94f2db94b05f",
+        "type": "telegram sender",
+        "z": "5e16a52bec253e51",
+        "name": "Notificar Telegram",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 650,
+        "y": 700,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "n10006",
+        "type": "mqtt in",
+        "z": "5e16a52bec253e51",
+        "name": "Sensores Dashboard",
+        "topic": "smarthome/equipo2/alerta",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "broker.local",
+        "inputs": 0,
+        "x": 140,
+        "y": 860,
+        "wires": [
+            [
+                "n10007"
+            ]
+        ]
+    },
+    {
+        "id": "n10007",
+        "type": "json",
+        "z": "5e16a52bec253e51",
+        "name": "Parsear JSON Dashboard",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 410,
+        "y": 860,
+        "wires": [
+            [
+                "n10008"
+            ]
+        ]
+    },
+    {
+        "id": "n10008",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Procesar Dashboard",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\nconst data = {\n    gas: d.gas != null ? d.gas : 0,\n    distancia: d.distancia != null ? d.distancia : 0,\n    sonido: d.sonido != null ? d.sonido : 0,\n    alerta: d.alerta || \"\"\n};\ncontext.set(\"sensor_data\", data);\nreturn [\n    { payload: data },       // Salida 1: Todo el objeto para el Dashboard\n    { payload: data.gas },   // Salida 2: Solo Gas para el Gráfico\n    { payload: data }        // Salida 3: Todo el objeto para SQLite\n];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 860,
+        "wires": [
+            [
+                "n10010",
+                "n10011",
+                "n10009"
+            ],
+            [
+                "n10031"
+            ],
+            [
+                "n10029"
+            ]
+        ]
+    },
+    {
+        "id": "n10010",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "ef630c160cd745d4",
+        "order": 1,
+        "width": 2,
+        "height": 1,
+        "name": "Distancia",
+        "label": "Distancia",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 18,
+        "color": "#3498db",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.distancia",
+        "valueType": "msg",
+        "x": 1010,
+        "y": 780,
+        "wires": []
+    },
+    {
+        "id": "n10011",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "ef630c160cd745d4",
+        "order": 2,
+        "width": 2,
+        "height": 1,
+        "name": "Gas",
+        "label": "Gas",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 18,
+        "color": "#f39c12",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.gas",
+        "valueType": "msg",
+        "x": 1010,
+        "y": 810,
+        "wires": []
+    },
+    {
+        "id": "n10013",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "n10001",
+        "order": 0,
+        "width": 2,
+        "height": 1,
+        "name": "Movimiento",
+        "label": "Movimiento",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 20,
+        "color": "#e67e22",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 910,
+        "y": 1100,
+        "wires": []
+    },
+    {
+        "id": "n10014",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "n10001",
+        "order": 1,
+        "width": 2,
+        "height": 1,
+        "name": "Persona",
+        "label": "Persona Detectada",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 20,
+        "color": "#9b59b6",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 760,
+        "y": 1140,
+        "wires": []
+    },
+    {
+        "id": "n10015",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "n10001",
+        "order": 2,
+        "width": 4,
+        "height": 1,
+        "name": "Alerta Sistema",
+        "label": "Alerta del Sistema",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 16,
+        "color": "#e74c3c",
+        "wrapText": true,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 960,
+        "y": 1020,
+        "wires": []
+    },
+    {
+        "id": "n10016",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Img a Dashboard",
+        "func": "if (msg.payload && msg.payload.type === \"Buffer\") {\n    const buf = Buffer.from(msg.payload.data);\n    const b64 = buf.toString(\"base64\");\n    msg.payload = \"data:image/jpeg;base64,\" + b64;\n    return msg;\n}\nif (Buffer.isBuffer(msg.payload)) {\n    const b64 = msg.payload.toString(\"base64\");\n    msg.payload = \"data:image/jpeg;base64,\" + b64;\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 120,
+        "wires": [
+            [
+                "n10017"
+            ]
+        ]
+    },
+    {
+        "id": "n10017",
+        "type": "ui-template",
+        "z": "5e16a52bec253e51",
+        "group": "n10003",
+        "name": "Vista Camara",
+        "order": 0,
+        "width": 6,
+        "height": 5,
+        "storeOutMessages": true,
+        "passthru": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1000,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "n10018",
+        "type": "trigger",
+        "z": "5e16a52bec253e51",
+        "name": "Trigger Captura",
+        "op1": "",
+        "op2": "",
+        "op1type": "nul",
+        "op2type": "nul",
+        "duration": 1,
+        "extend": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "",
+        "outputs": 1,
+        "x": 420,
+        "y": 160,
+        "wires": [
+            [
+                "get_foto"
+            ]
+        ]
+    },
+    {
+        "id": "n10019",
+        "type": "ui-button",
+        "z": "5e16a52bec253e51",
+        "group": "n10004",
+        "name": "Capturar Manual",
+        "label": "Capturar Imagen",
+        "order": 0,
+        "width": 3,
+        "height": 2,
+        "tooltip": "Solicitar captura manual de imagen",
+        "color": "#ffffff",
+        "icon": "",
+        "payload": "",
+        "payloadType": "date",
+        "topic": "",
+        "enableClick": true,
+        "x": 190,
+        "y": 160,
+        "wires": [
+            [
+                "n10018"
+            ]
+        ]
+    },
+    {
+        "id": "n10020",
+        "type": "mqtt out",
+        "z": "5e16a52bec253e51",
+        "name": "Publicar LED Dashboard",
+        "topic": "smarthome/equipo2/control/led",
+        "qos": "1",
+        "retain": false,
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "broker.local",
+        "x": 570,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "n10021",
+        "type": "ui-switch",
+        "z": "5e16a52bec253e51",
+        "name": "Control LED",
+        "label": "Actuador LED",
+        "group": "n10004",
+        "order": 1,
+        "width": 3,
+        "height": 2,
+        "passthru": true,
+        "decouple": false,
+        "topic": "",
+        "topicType": "str",
+        "style": "default",
+        "className": "",
+        "layout": "",
+        "clickableArea": "switch",
+        "onvalue": "on",
+        "onvalueType": "str",
+        "onicon": "",
+        "oncolor": "",
+        "offvalue": "off",
+        "offvalueType": "str",
+        "officon": "",
+        "offcolor": "",
+        "x": 320,
+        "y": 620,
+        "wires": [
+            [
+                "n10020"
+            ]
+        ]
+    },
+    {
+        "id": "n10022",
+        "type": "mqtt in",
+        "z": "5e16a52bec253e51",
+        "name": "Eventos Camara Dashboard",
+        "topic": "smarthome/equipo1/camara/evento",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "broker.local",
+        "inputs": 0,
+        "x": 120,
+        "y": 960,
+        "wires": [
+            [
+                "n10023"
+            ]
+        ]
+    },
+    {
+        "id": "n10023",
+        "type": "json",
+        "z": "5e16a52bec253e51",
+        "name": "Parsear Evento Camara",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 390,
+        "y": 960,
+        "wires": [
+            [
+                "n10024",
+                "n10026"
+            ]
+        ]
+    },
+    {
+        "id": "n10024",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Estado del Sistema",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\ncontext.set(\"sys_state\", { movimiento: d.movimiento || false, alerta: d.alerta || \"ninguna\", identidad: d.identidad || \"\", timestamp: Date.now() });\nlet nivel = \"OK\";\nlet mensaje = \"Sistema Normal\";\nlet color = \"#2ecc71\";\nif (d.alerta === \"intruso_detectado\") { nivel = \"ALERTA\"; mensaje = \"INTRUSO DETECTADO\"; color = \"#e74c3c\"; }\nelse if (d.alerta === \"persona_identificada\") { nivel = \"WARNING\"; mensaje = \"Identificado: \" + (d.identidad || \"Desconocido\"); color = \"#f39c12\"; }\nmsg.payload = { nivel: nivel, mensaje: mensaje, color: color };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 940,
+        "wires": [
+            [
+                "n10025",
+                "n10015"
+            ]
+        ]
+    },
+    {
+        "id": "n10025",
+        "type": "ui-template",
+        "z": "5e16a52bec253e51",
+        "group": "n10002",
+        "name": "Indicador Estado",
+        "order": 0,
+        "width": 4,
+        "height": 3,
+        "templateScope": "local",
+        "className": "",
+        "x": 950,
+        "y": 960,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "n10026",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Actualizar Deteccion",
+        "func": "const d = msg.payload;\nif (!d || typeof d !== \"object\") return null;\nlet motion = d.movimiento ? \"Si\" : \"No\";\nlet person = \"No\";\nif (d.alerta === \"persona_identificada\") person = d.identidad || \"Si\";\nelse if (d.alerta === \"intruso_detectado\") person = \"Desconocido\";\nlet alertText = \"Sin alertas\";\nif (d.alerta === \"intruso_detectado\") alertText = \"INTRUSO detectado\";\nelse if (d.alerta === \"persona_identificada\") alertText = \"Identificado: \" + (d.identidad || \"Desconocido\");\nreturn [\n    { payload: motion },\n    { payload: person },\n    { payload: alertText }\n];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 620,
+        "y": 1040,
+        "wires": [
+            [
+                "n10013"
+            ],
+            [
+                "n10014"
+            ],
+            [
+                "n10015"
+            ]
+        ]
+    },
+    {
+        "id": "n10028",
+        "type": "inject",
+        "z": "5e16a52bec253e51",
+        "name": "Iniciar BD",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 1,
+        "topic": "CREATE TABLE IF NOT EXISTS sensor_history (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, sonido REAL, gas INTEGER, distancia REAL)",
+        "payload": "ready",
+        "payloadType": "str",
+        "x": 1120,
+        "y": 1220,
+        "wires": [
+            [
+                "n10027"
+            ]
+        ]
+    },
+    {
+        "id": "n10029",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Insertar SQLite",
+        "func": "// El objeto data llega en msg.payload desde la salida 3 del nodo anterior\nconst d = msg.payload;\nif (!d) return null;\n\nmsg.topic = \"INSERT INTO sensor_history (temperatura, humedad, gas, distancia) VALUES (?, ?, ?, ?);\";\nmsg.payload = [d.temperatura || 0, d.humedad || 0, d.gas || 0, d.distancia || 0];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 900,
+        "wires": [
+            [
+                "n10030"
+            ]
+        ]
+    },
+    {
+        "id": "n10031",
+        "type": "ui-chart",
+        "z": "5e16a52bec253e51",
+        "group": "n10005",
+        "name": "Grafico Gas",
+        "label": "Historico Gas",
+        "order": 0,
+        "chartType": "line",
+        "category": "payload.gas",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "",
+        "yAxisProperty": "",
+        "yAxisPropertyType": "property",
+        "ymin": "",
+        "ymax": "",
+        "bins": "",
+        "stackSeries": false,
+        "pointRadius": "",
+        "showLegend": true,
+        "removeOlder": 86400,
+        "removeOlderUnit": "86400",
+        "removeOlderPoints": "",
+        "colors": [
+            "#e74c3c",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000",
+            "#000000"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": 12,
+        "height": 4,
+        "className": "",
+        "interpolation": "linear",
+        "x": 1570,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "n10032",
+        "type": "inject",
+        "z": "5e16a52bec253e51",
+        "name": "Cargar Historial",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 3,
+        "topic": "SELECT timestamp, gas FROM sensor_history ORDER BY timestamp ASC LIMIT 200",
+        "x": 1400,
+        "y": 1020,
+        "wires": [
+            [
+                "n10033"
+            ]
+        ]
+    },
+    {
+        "id": "n10034",
+        "type": "function",
+        "z": "5e16a52bec253e51",
+        "name": "Formatear Historial",
+        "func": "// Simplifica el nodo Formatear Historial\nconst rows = msg.payload;\nif (!rows || !Array.isArray(rows)) return null;\n\n// Convertimos las filas de la BD en un formato que el gráfico entienda\n// El gráfico necesita un array de objetos {x: tiempo, y: valor}\nreturn [rows.map(row => {\n    return {\n        topic: \"Gas\", // Nombre de la línea en el gráfico\n        payload: row.gas,\n        timestamp: new Date(row.timestamp).getTime()\n    };\n})];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 900,
+        "wires": [
+            [
+                "n10031"
+            ]
+        ]
+    },
+    {
+        "id": "n10027",
+        "type": "sqlite",
+        "z": "5e16a52bec253e51",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite DB",
+        "x": 1300,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "n10030",
+        "type": "sqlite",
+        "z": "5e16a52bec253e51",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "Insertar Dato",
+        "x": 1150,
+        "y": 900,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "n10033",
+        "type": "sqlite",
+        "z": "5e16a52bec253e51",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "Consultar Historial",
+        "x": 1390,
+        "y": 960,
+        "wires": [
+            [
+                "n10034"
+            ]
+        ]
+    },
+    {
+        "id": "n10009",
+        "type": "ui-text",
+        "z": "5e16a52bec253e51",
+        "group": "ef630c160cd745d4",
+        "order": 0,
+        "width": 2,
+        "height": 1,
+        "name": "Sonido",
+        "label": "Sonido",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": true,
+        "font": "",
+        "fontSize": 18,
+        "color": "#e74c3c",
+        "wrapText": false,
+        "className": "",
+        "value": "payload.sonido",
+        "valueType": "msg",
+        "x": 1000,
+        "y": 750,
+        "wires": []
+    },
+    {
+        "id": "e46f1f74892fd7ee",
+        "type": "mqtt in",
+        "z": "427c0b64ee6ac87e",
+        "name": "Sensores MKR1000",
+        "topic": "smarthome/equipo2/alerta",
+        "qos": "2",
+        "datatype": "utf8",
+        "broker": "broker.local",
+        "inputs": 0,
+        "x": 140,
+        "y": 120,
+        "wires": [
+            [
+                "fb2b8ff28e1263ba"
+            ]
+        ]
+    },
+    {
+        "id": "fb2b8ff28e1263ba",
+        "type": "json",
+        "z": "427c0b64ee6ac87e",
+        "name": "Parsear JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "a99506e19d4aad4e",
+                "66e879e662da8e2f"
+            ]
+        ]
+    },
+    {
+        "id": "a99506e19d4aad4e",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Verificar umbrales",
+        "func": "const d = msg.payload;\nconst cooldown = 2000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 20) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 100) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 80) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 120,
+        "wires": [
+            [
+                "641588c348200e9b",
+                "c96ac5a9aff218c0"
+            ]
+        ]
+    },
+    {
+        "id": "641588c348200e9b",
+        "type": "telegram sender",
+        "z": "427c0b64ee6ac87e",
+        "name": "Enviar alerta",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 710,
+        "y": 120,
+        "wires": [
+            [
+                "67309473b0d05bd1"
+            ]
+        ]
+    },
+    {
+        "id": "135bff6490734fe8",
+        "type": "telegram command",
+        "z": "427c0b64ee6ac87e",
+        "name": "Comando /led",
+        "command": "/led",
+        "bot": "bot.telegram",
+        "strict": false,
+        "hasresponse": false,
+        "useregex": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "a244db115a69c0ab"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a244db115a69c0ab",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Mapear comando LED",
+        "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, {\n        payload: { chatId: chatId, type: 'message', content: '❌ Usá: /led ON, /led OFF o /led TOGGLE' }\n    }];\n}\n\nreturn [\n    { payload: accion },                                        // Output 1 → MQTT\n    { payload: { chatId: chatId, type: 'message', content: '✅ LED ' + accion } }  // Output 2 → Telegram\n];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 350,
+        "y": 280,
+        "wires": [
+            [
+                "872d075bc1fc910e"
+            ],
+            [
+                "db098d3c7492f41e"
+            ]
+        ]
+    },
+    {
+        "id": "872d075bc1fc910e",
+        "type": "mqtt out",
+        "z": "427c0b64ee6ac87e",
+        "name": "Publicar comando",
+        "topic": "smarthome/equipo2/control/led",
+        "qos": "1",
+        "retain": false,
+        "broker": "broker.local",
+        "x": 570,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "db098d3c7492f41e",
+        "type": "telegram sender",
+        "z": "427c0b64ee6ac87e",
+        "name": "Confirmar comando",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 570,
+        "y": 310,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ceb08bc9d9b99abb",
+        "type": "mqtt in",
+        "z": "427c0b64ee6ac87e",
+        "name": "Estado del LED",
+        "topic": "smarthome/equipo2/led/state",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "broker.local",
+        "inputs": 0,
+        "x": 140,
+        "y": 400,
+        "wires": [
+            [
+                "fb8f3442063b4d9b"
+            ]
+        ]
+    },
+    {
+        "id": "fb8f3442063b4d9b",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Notificar estado LED",
+        "func": "const estado = String(msg.payload).toUpperCase();\nconst icono = estado === 'ON' ? '🟢' : '🔴';\nmsg.payload = {\n    chatId: '1138232122',\n    type: 'message',\n    content: icono + ' LED ' + (estado === 'ON' ? 'ENCENDIDO' : 'APAGADO')\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 340,
+        "y": 400,
+        "wires": [
+            [
+                "666a090fdbbd52f3"
+            ]
+        ]
+    },
+    {
+        "id": "666a090fdbbd52f3",
+        "type": "telegram sender",
+        "z": "427c0b64ee6ac87e",
+        "name": "Notificar Telegram",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 550,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c96ac5a9aff218c0",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 740,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "66e879e662da8e2f",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 430,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "67309473b0d05bd1",
+        "type": "debug",
+        "z": "427c0b64ee6ac87e",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 950,
+        "y": 80,
+        "wires": []
+    }
+]
