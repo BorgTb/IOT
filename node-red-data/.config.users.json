@@ -24,7 +24,13 @@
             }
         },
         "debug": {
-            "filter": "filterAll"
+            "filter": "filterSelected",
+            "filteredNodes": [
+                "b92fd24676f0c14b",
+                "1e2a85f3a05f3c9f",
+                "b0c692ae3c944911",
+                "37e98b57d6c9b373"
+            ]
         }
     }
 }

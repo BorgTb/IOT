@@ -3,8 +3,8 @@
 #include "esp_http_server.h"
 
 // ─── Configura tu WiFi ───────────────────────────────
-const char* ssid     = "iPhoneTintin";
-const char* password = "agu12355";
+const char* ssid     = "Casa_Meza";
+const char* password = "18351835";
 
 // ─── Pinout ESP32-CAM (Modelo AI-Thinker) ────────────
 #define PWDN_GPIO_NUM     32

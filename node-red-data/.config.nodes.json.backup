@@ -779,7 +779,7 @@
     "node-red-node-sqlite": {
         "name": "node-red-node-sqlite",
         "version": "2.0.1",
-        "local": false,
+        "local": true,
         "user": true,
         "nodes": {
             "sqlite": {
@@ -789,10 +789,10 @@
                     "sqlite"
                 ],
                 "enabled": true,
-                "local": false,
+                "local": true,
                 "user": false,
                 "module": "node-red-node-sqlite",
-                "file": "/usr/src/node-red/node_modules/node-red-node-sqlite/sqlite.js"
+                "file": "/data/node_modules/node-red-node-sqlite/sqlite.js"
             }
         }
     }

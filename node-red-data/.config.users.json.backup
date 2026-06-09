@@ -19,12 +19,19 @@
             "dialog": {
                 "export": {
                     "pretty": true,
-                    "json-view": false
+                    "json-view": true
                 }
             }
         },
         "debug": {
-            "filter": "filterAll"
+            "filter": "filterSelected",
+            "filteredNodes": [
+                "b92fd24676f0c14b",
+                "1e2a85f3a05f3c9f",
+                "b0c692ae3c944911",
+                "d881b6c13fa6bd76",
+                "37e98b57d6c9b373"
+            ]
         }
     }
 }
