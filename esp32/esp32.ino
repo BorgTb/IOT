@@ -3,8 +3,8 @@
 #include "esp_http_server.h"
 
 // ─── Configura tu WiFi ───────────────────────────────
-const char* ssid     = "Casa_Meza";
-const char* password = "18351835";
+const char* ssid     = "iPhoneTintin";
+const char* password = "agu12355";
 
 // ─── Pinout ESP32-CAM (Modelo AI-Thinker) ────────────
 #define PWDN_GPIO_NUM     32
@@ -66,27 +66,16 @@ esp_err_t stream_handler(httpd_req_t *req) {
     return res;
 }
 
-// --- Endpoint 2: Foto Estática con máxima calidad ---
 esp_err_t capture_handler(httpd_req_t *req) {
     camera_fb_t *fb = NULL;
-    esp_err_t res = ESP_OK;
-
-    // Ajustar cámara a máxima calidad para la captura
-    sensor_t *s = esp_camera_sensor_get();
-    if (s) {
-        s->set_framesize(s, FRAMESIZE_VGA);  // 640x480 (mayor resolución)
-        s->set_quality(s, 5);                 // menor compresión = mejor calidad
-        delay(50); // tiempo para que el sensor se estabilice
+    
+    // Reintentar hasta 3 veces si el buffer está ocupado
+    for (int i = 0; i < 3; i++) {
+        fb = esp_camera_fb_get();
+        if (fb) break;
+        delay(100);
     }
-
-    fb = esp_camera_fb_get();
-
-    // Restaurar configuración del stream
-    if (s) {
-        s->set_framesize(s, FRAMESIZE_QVGA);
-        s->set_quality(s, 15);
-    }
-
+    
     if (!fb) {
         Serial.println("Error capturando foto");
         httpd_resp_send_500(req);
@@ -94,10 +83,9 @@ esp_err_t capture_handler(httpd_req_t *req) {
     }
 
     httpd_resp_set_type(req, "image/jpeg");
-    httpd_resp_set_hdr(req, "Content-Disposition", "inline; filename=capture.jpg");
     httpd_resp_set_hdr(req, "Access-Control-Allow-Origin", "*");
-
-    res = httpd_resp_send(req, (const char *)fb->buf, fb->len);
+    httpd_resp_set_hdr(req, "Cache-Control", "no-cache");
+    esp_err_t res = httpd_resp_send(req, (const char *)fb->buf, fb->len);
     esp_camera_fb_return(fb);
     return res;
 }
@@ -143,7 +131,7 @@ void setup() {
     
     // SVGA (800x600) o VGA (640x480). Para 30FPS mantenlo en QVGA o VGA.
     config.frame_size   = FRAMESIZE_QVGA; 
-    config.jpeg_quality = 15; // Menor compresión, se ve mejor
+    config.jpeg_quality = 12; // Menor compresión, se ve mejor
     config.fb_count     = 2; // Doble buffer vital para stream
     config.fb_location  = CAMERA_FB_IN_PSRAM;
     config.grab_mode    = CAMERA_GRAB_LATEST; 

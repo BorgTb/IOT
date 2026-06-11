@@ -30,7 +30,6 @@ services:
       - "1880:1880"        # Interfaz web de Node-RED
     volumes:
       - ./node-red-data:/data
-      - ./sql-data:/usr/src/node-red/data_general
     depends_on:
       - mosquitto
     networks:

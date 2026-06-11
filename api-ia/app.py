@@ -157,6 +157,13 @@ def imagen_base64_a_array(imagen_base64):
         if ',' in imagen_base64:
             imagen_base64 = imagen_base64.split(',')[1]
 
+        # --- FIX DE PADDING ---
+        # Calculamos si faltan caracteres para ser múltiplo de 4 y los agregamos
+        padding_faltante = len(imagen_base64) % 4
+        if padding_faltante != 0:
+            imagen_base64 += '=' * (4 - padding_faltante)
+        # ----------------------
+
         img_bytes = base64.b64decode(imagen_base64)
         img_array = np.frombuffer(img_bytes, dtype=np.uint8)
 
@@ -168,7 +175,6 @@ def imagen_base64_a_array(imagen_base64):
         return frame
     except Exception as e:
         raise ValueError(f"Error decodificando imagen: {e}")
-
 
 def procesar_frame_reconocimiento(frame):
     """
@@ -350,33 +356,22 @@ def train():
         errores = []
         rutas_guardadas = []
 
-        # Crear directorio para la persona
+        # Crear directorio temporal para la persona (se elimina si no hay encodings válidos)
         dir_persona = os.path.join(IMAGENES_DB, nombre)
+        dir_existia = os.path.exists(dir_persona)
         os.makedirs(dir_persona, exist_ok=True)
 
         for idx, imagen_b64 in enumerate(imagenes):
             try:
                 frame = imagen_base64_a_array(imagen_b64)
 
-                # Guardar imagen en disco
-                ext = ".jpg"
-                ruta_img = os.path.join(dir_persona, f"rostro_{idx + 1}{ext}")
-                cv2.imwrite(ruta_img, frame)
-                rutas_guardadas.append(ruta_img)
-
-                # Procesar para encoding
+                # Convertir a RGB para face_recognition
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 h, w = rgb_frame.shape[:2]
                 print(f"Imagen {idx + 1}: {w}x{h}", flush=True)
 
-                if w < 800 or h < 600:
-                    scale_factor = max(800 / w, 600 / h)
-                    new_w = int(w * scale_factor)
-                    new_h = int(h * scale_factor)
-                    rgb_frame = cv2.resize(rgb_frame, (new_w, new_h))
-                    print(f"Imagen redimensionada a: {new_w}x{new_h}", flush=True)
-
-                face_locations = face_recognition.face_locations(rgb_frame, model="hog")
+                # Usamos el modelo 'cnn' y upsample=1 para detectar rostros en 320x240
+                face_locations = face_recognition.face_locations(rgb_frame, number_of_times_to_upsample=1, model="cnn")
                 print(f"Face locations encontradas: {len(face_locations)}", flush=True)
 
                 if not face_locations:
@@ -391,7 +386,13 @@ def train():
                 if face_encodings_list:
                     nuevos_encodings.append(face_encodings_list[0])
                     rostros_procesados += 1
-                    print(f"Imagen {idx + 1}: Encoding generado exitosamente", flush=True)
+
+                    # Guardar imagen SOLO si el rostro es válido
+                    ext = ".jpg"
+                    ruta_img = os.path.join(dir_persona, f"rostro_{idx + 1}{ext}")
+                    cv2.imwrite(ruta_img, frame)
+                    rutas_guardadas.append(ruta_img)
+                    print(f"Imagen {idx + 1}: Encoding generado y guardada en disco", flush=True)
 
             except Exception as e:
                 print(f"Imagen {idx + 1}: EXCEPCION - {str(e)}", flush=True)
@@ -399,6 +400,11 @@ def train():
                 continue
 
         if not nuevos_encodings:
+            # Limpiar directorio si fue recién creado y no tiene imágenes válidas
+            if not dir_existia:
+                import shutil
+                shutil.rmtree(dir_persona, ignore_errors=True)
+                print(f"Directorio eliminado (sin rostros validos): {dir_persona}", flush=True)
             return jsonify({
                 'success': False,
                 'message': 'No se pudo procesar ninguna imagen valida',
@@ -603,8 +609,6 @@ def agregar_imagenes_face(nombre):
         for idx, imagen_b64 in enumerate(imagenes):
             try:
                 frame = imagen_base64_a_array(imagen_b64)
-                ruta_img = os.path.join(dir_persona, f"rostro_{next_idx + idx}.jpg")
-                cv2.imwrite(ruta_img, frame)
 
                 rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 if rgb_frame.shape[1] < 800 or rgb_frame.shape[0] < 600:
@@ -623,6 +627,9 @@ def agregar_imagenes_face(nombre):
                 face_encodings_list = face_recognition.face_encodings(rgb_frame, face_locations)
                 if face_encodings_list:
                     nuevos_encodings.append(face_encodings_list[0])
+                    # Guardar imagen SOLO si el rostro es válido
+                    ruta_img = os.path.join(dir_persona, f"rostro_{next_idx + idx}.jpg")
+                    cv2.imwrite(ruta_img, frame)
                     guardadas += 1
 
             except Exception as e:

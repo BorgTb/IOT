@@ -24,17 +24,23 @@
             }
         },
         "debug": {
-            "filter": "filterSelected",
+            "filter": "filterAll",
             "filteredNodes": [
                 "b92fd24676f0c14b",
                 "1e2a85f3a05f3c9f",
                 "b0c692ae3c944911",
                 "37e98b57d6c9b373",
-                "4875509425932182",
                 "e76e989dfc0d8fe4",
                 "9887d398167474d6",
                 "b4be617b75222d08",
-                "c2dab189f25f0e68"
+                "c2dab189f25f0e68",
+                "4875509425932182",
+                "debug_ver_peticion",
+                "888b8d88c2cb525d",
+                "21e62ee0937e3540",
+                "1952a2ce174183d9",
+                "c768436a30435d64",
+                "cefb12462491f668"
             ]
         }
     }

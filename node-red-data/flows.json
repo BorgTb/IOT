@@ -14,7 +14,7 @@
         "disabled": false
     },
     {
-        "id": "112319f8be4f42e5",
+        "id": "3bbd5d9ca8e6cdee",
         "type": "tab",
         "label": "Script dbs",
         "disabled": true,
@@ -25,7 +25,7 @@
         "id": "367352e091ce6828",
         "type": "mqtt-broker",
         "name": "MQTT-HOST-PC",
-        "broker": "192.168.1.7",
+        "broker": "172.20.10.3",
         "port": 1883,
         "clientid": "",
         "autoConnect": true,
@@ -219,6 +219,7 @@
         "chatids": "",
         "baseapiurl": "",
         "testenvironment": false,
+        "updatemode": "none",
         "pollinterval": "",
         "usesocks": false,
         "sockshost": "",
@@ -267,15 +268,15 @@
     {
         "id": "n10003",
         "type": "ui-group",
-        "name": "Camara",
+        "name": "Ultimo detectado",
         "page": "c56b25868f79b38f",
         "width": 6,
         "height": 5,
         "order": 4,
         "showTitle": true,
         "className": "",
-        "visible": true,
-        "disabled": false,
+        "visible": "true",
+        "disabled": "false",
         "groupType": "default"
     },
     {
@@ -311,6 +312,63 @@
         "type": "sqlitedb",
         "db": "data_general",
         "mode": "RWC"
+    },
+    {
+        "id": "page_registro_ia",
+        "type": "ui-page",
+        "z": "427c0b64ee6ac87e",
+        "name": "Registro de Personal",
+        "ui": "194f68af3aa0c514",
+        "path": "/registro",
+        "icon": "user-plus",
+        "layout": "grid",
+        "theme": "de87a90193a77446",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 2,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "group_stream_vivo",
+        "type": "ui-group",
+        "z": "427c0b64ee6ac87e",
+        "name": "Cámara en Vivo",
+        "page": "page_registro_ia",
+        "width": 6,
+        "height": 6,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
+    },
+    {
+        "id": "group_formulario_train",
+        "type": "ui-group",
+        "z": "427c0b64ee6ac87e",
+        "name": "Acciones de Registro",
+        "page": "page_registro_ia",
+        "width": 6,
+        "height": 6,
+        "order": 2,
+        "showTitle": true,
+        "className": "",
+        "visible": true,
+        "disabled": false,
+        "groupType": "default"
     },
     {
         "id": "f7cbde09dbdf6e68",
@@ -1440,8 +1498,8 @@
         "bot": "bot.telegram",
         "haserroroutput": true,
         "outputs": 2,
-        "x": 970,
-        "y": 280,
+        "x": 1010,
+        "y": 300,
         "wires": [
             [],
             []
@@ -1457,14 +1515,14 @@
                 "p": "payload"
             }
         ],
-        "repeat": "",
+        "repeat": "2",
         "crontab": "",
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 380,
+        "x": 390,
         "y": 220,
         "wires": [
             [
@@ -1480,7 +1538,7 @@
         "method": "GET",
         "ret": "bin",
         "paytoqs": "ignore",
-        "url": "http://192.168.1.9/capture",
+        "url": "http://172.20.10.8/capture",
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -1492,8 +1550,7 @@
         "y": 220,
         "wires": [
             [
-                "03a830fe843d99d2",
-                "c8f19778038419b0"
+                "03a830fe843d99d2"
             ]
         ]
     },
@@ -1502,7 +1559,7 @@
         "type": "function",
         "z": "427c0b64ee6ac87e",
         "name": "Buffer a Base64 JSON",
-        "func": "// La API nueva espera un JSON con la imagen en base64\nlet base64Image = msg.payload.toString('base64');\n\nmsg.payload = {\n    \"image\": base64Image\n};\n\n// Asegurar que enviamos JSON\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\n\nreturn msg;",
+        "func": "// La API nueva espera un JSON con la imagen en base64\nlet base64Image = msg.payload.toString('base64');\n\n// NUEVO: Guardamos la imagen en memoria para el registro manual\nflow.set('ultima_captura_b64', base64Image);\n\nmsg.payload = {\n    \"image\": base64Image\n};\n\n// Asegurar que enviamos JSON\nmsg.headers = {\n    \"Content-Type\": \"application/json\"\n};\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -1546,8 +1603,8 @@
         "type": "function",
         "z": "427c0b64ee6ac87e",
         "name": "Evaluar Rostros",
-        "func": "let msg1 = null; // Alerta MQTT\nlet msg3 = { payload: \"\" }; // Texto Dashboard\n\n// Revisar si la API respondió correctamente y trajo rostros\nif (msg.payload && msg.payload.success && msg.payload.rostros && msg.payload.rostros.length > 0) {\n    \n    // Tomar el rostro principal de la lista\n    let rostro = msg.payload.rostros[0]; \n    \n    if (rostro.reconocido) {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"persona_identificada\",\n            \"identidad\": rostro.nombre,\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"🚨 Detectado: \" + rostro.nombre.toUpperCase();\n    } else {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"intruso_detectado\",\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"⚠️ INTRUSO DESCONOCIDO\";\n    }\n} else {\n    // Si no hay rostros o dio error por foto vacía\n    msg3.payload = \"✅ Sin rostros / Escaneando...\";\n}\n\nreturn [msg1, msg3];",
-        "outputs": 2,
+        "func": "let msg1 = null; // Alerta MQTT\nlet msg3 = { payload: \"\" }; // Texto Dashboard\nlet msgImagen = null; // Imagen estática para el Dashboard\n\n// Revisar si la API respondió correctamente y trajo rostros\nif (msg.payload && msg.payload.success && msg.payload.rostros && msg.payload.rostros.length > 0) {\n\n    // Tomar el rostro principal de la lista\n    let rostro = msg.payload.rostros[0];\n\n    if (rostro.reconocido) {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"persona_identificada\",\n            \"identidad\": rostro.nombre,\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"🚨 Detectado: \" + rostro.nombre.toUpperCase();\n    } else {\n        let alertaJSON = {\n            \"equipo\": \"equipo1\",\n            \"alerta\": \"intruso_detectado\",\n            \"movimiento\": true\n        };\n        msg1 = { payload: alertaJSON };\n        msg3.payload = \"⚠️ INTRUSO DESCONOCIDO\";\n    }\n\n    // --- NUEVO: Extraemos la foto de la memoria y la enviamos al Dashboard ---\n    let b64 = flow.get('ultima_captura_b64');\n    if (b64) {\n        msgImagen = { payload: \"data:image/jpeg;base64,\" + b64 };\n    }\n\n} else {\n    // Si no hay rostros, actualizamos texto pero NO enviamos imagen.\n    // Así el dashboard se queda congelado en la última persona que pasó.\n    msg3.payload = \"✅ Sin rostros / Escaneando...\";\n}\n\n// Retornamos las 3 salidas\nreturn [msg1, msg3, msgImagen];",
+        "outputs": 3,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
@@ -1561,6 +1618,9 @@
             ],
             [
                 "43abd1425f91bd87"
+            ],
+            [
+                "96bf79c58c716c0f"
             ]
         ]
     },
@@ -1687,7 +1747,7 @@
         "type": "function",
         "z": "427c0b64ee6ac87e",
         "name": "Verificar umbrales",
-        "func": "const d = msg.payload;\nconst cooldown = 30000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 20) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 100) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 80) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
+        "func": "const d = msg.payload;\nconst cooldown = 30000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 5) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 200) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 70) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
         "outputs": 1,
         "timeout": "",
         "noerr": 0,
@@ -1700,91 +1760,6 @@
             [
                 "4b1da990d29b6b49"
             ]
-        ]
-    },
-    {
-        "id": "4b1da990d29b6b49",
-        "type": "telegram sender",
-        "z": "427c0b64ee6ac87e",
-        "name": "Enviar alerta",
-        "bot": "bot.telegram",
-        "haserroroutput": true,
-        "outputs": 2,
-        "x": 1200,
-        "y": 420,
-        "wires": [
-            [],
-            []
-        ]
-    },
-    {
-        "id": "5bade891a99aee0c",
-        "type": "telegram command",
-        "z": "427c0b64ee6ac87e",
-        "name": "Comando /led",
-        "command": "/led",
-        "bot": "bot.telegram",
-        "strict": false,
-        "hasresponse": false,
-        "useregex": false,
-        "outputs": 2,
-        "x": 540,
-        "y": 500,
-        "wires": [
-            [
-                "5bfadef557fa50df"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "5bfadef557fa50df",
-        "type": "function",
-        "z": "427c0b64ee6ac87e",
-        "name": "Mapear comando LED",
-        "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, { payload: '❌ Usá: /led ON, /led OFF o /led TOGGLE', chatId: chatId }];\n}\n\nreturn [\n    { payload: accion },                    // Output 1 → MQTT\n    { payload: '✅ LED ' + accion, chatId: chatId }  // Output 2 → Telegram\n];",
-        "outputs": 2,
-        "noerr": 0,
-        "x": 760,
-        "y": 500,
-        "wires": [
-            [
-                "e6b6ca4950c1dbea"
-            ],
-            [
-                "14a1079ad808f055"
-            ]
-        ]
-    },
-    {
-        "id": "e6b6ca4950c1dbea",
-        "type": "mqtt out",
-        "z": "427c0b64ee6ac87e",
-        "name": "Publicar comando",
-        "topic": "smarthome/equipo2/control/led",
-        "qos": "1",
-        "retain": false,
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "367352e091ce6828",
-        "x": 980,
-        "y": 480,
-        "wires": []
-    },
-    {
-        "id": "14a1079ad808f055",
-        "type": "telegram sender",
-        "z": "427c0b64ee6ac87e",
-        "name": "Confirmar comando",
-        "bot": "bot.telegram",
-        "outputs": 1,
-        "x": 980,
-        "y": 530,
-        "wires": [
-            []
         ]
     },
     {
@@ -2022,91 +1997,25 @@
         "wires": []
     },
     {
-        "id": "c8f19778038419b0",
-        "type": "function",
-        "z": "427c0b64ee6ac87e",
-        "name": "Img a Dashboard",
-        "func": "if (msg.payload && msg.payload.type === \"Buffer\") {\n    const buf = Buffer.from(msg.payload.data);\n    const b64 = buf.toString(\"base64\");\n    msg.payload = \"data:image/jpeg;base64,\" + b64;\n    return msg;\n}\nif (Buffer.isBuffer(msg.payload)) {\n    const b64 = msg.payload.toString(\"base64\");\n    msg.payload = \"data:image/jpeg;base64,\" + b64;\n    return msg;\n}\nreturn null;",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 790,
-        "y": 100,
-        "wires": [
-            [
-                "96bf79c58c716c0f"
-            ]
-        ]
-    },
-    {
         "id": "96bf79c58c716c0f",
         "type": "ui-template",
         "z": "427c0b64ee6ac87e",
         "group": "n10003",
+        "page": "",
+        "ui": "",
         "name": "Vista Camara",
         "order": 0,
         "width": 6,
         "height": 5,
+        "format": "<template>\n    <div style=\"display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;\">\n        <img v-if=\"msg?.payload\" :src=\"msg.payload\" style=\"max-width: 100%; border-radius: 8px;\" alt=\"Captura de cámara\" />\n        <div v-else style=\"text-align: center; color: #888;\">\n            Esperando imagen...\n        </div>\n    </div>\n</template>",
         "storeOutMessages": true,
         "passthru": true,
         "templateScope": "local",
         "className": "",
-        "x": 1000,
-        "y": 100,
+        "x": 1420,
+        "y": 120,
         "wires": [
             []
-        ]
-    },
-    {
-        "id": "2da43453e30c028e",
-        "type": "trigger",
-        "z": "427c0b64ee6ac87e",
-        "name": "Trigger Captura",
-        "op1": "",
-        "op2": "",
-        "op1type": "nul",
-        "op2type": "nul",
-        "duration": 1,
-        "extend": false,
-        "units": "s",
-        "reset": "",
-        "bytopic": "all",
-        "topic": "",
-        "outputs": 1,
-        "x": 420,
-        "y": 140,
-        "wires": [
-            [
-                "9d78e3d7b9415806"
-            ]
-        ]
-    },
-    {
-        "id": "7e6e3e47f167dc77",
-        "type": "ui-button",
-        "z": "427c0b64ee6ac87e",
-        "group": "n10004",
-        "name": "Capturar Manual",
-        "label": "Capturar Imagen",
-        "order": 0,
-        "width": 3,
-        "height": 2,
-        "tooltip": "Solicitar captura manual de imagen",
-        "color": "#ffffff",
-        "icon": "",
-        "payload": "",
-        "payloadType": "date",
-        "topic": "",
-        "enableClick": true,
-        "x": 190,
-        "y": 140,
-        "wires": [
-            [
-                "2da43453e30c028e"
-            ]
         ]
     },
     {
@@ -2214,26 +2123,8 @@
         "y": 920,
         "wires": [
             [
-                "a1a3a229bd12bc78",
-                "c32d7c1208ad7978"
+                "a1a3a229bd12bc78"
             ]
-        ]
-    },
-    {
-        "id": "c32d7c1208ad7978",
-        "type": "ui-template",
-        "z": "427c0b64ee6ac87e",
-        "group": "n10002",
-        "name": "Indicador Estado",
-        "order": 0,
-        "width": 4,
-        "height": 3,
-        "templateScope": "local",
-        "className": "",
-        "x": 950,
-        "y": 940,
-        "wires": [
-            []
         ]
     },
     {
@@ -2614,7 +2505,7 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 1390,
+        "x": 1590,
         "y": 1380,
         "wires": [
             [
@@ -2668,9 +2559,264 @@
         ]
     },
     {
-        "id": "d03565b8ca285509",
+        "id": "ac622f09e8e3dc8a",
         "type": "inject",
-        "z": "112319f8be4f42e5",
+        "z": "427c0b64ee6ac87e",
+        "name": "Iniciar BD",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 1,
+        "topic": "CREATE TABLE IF NOT EXISTS sensor_history (id INTEGER PRIMARY KEY AUTOINCREMENT, timestamp DATETIME DEFAULT CURRENT_TIMESTAMP, sonido REAL, gas INTEGER, distancia REAL)",
+        "payload": "ready",
+        "payloadType": "str",
+        "x": 1220,
+        "y": 1260,
+        "wires": [
+            [
+                "5a83943c9218e9c9"
+            ]
+        ]
+    },
+    {
+        "id": "5a83943c9218e9c9",
+        "type": "sqlite",
+        "z": "427c0b64ee6ac87e",
+        "mydb": "a0244ea576e1de63",
+        "sqlquery": "msg.topic",
+        "sql": "",
+        "name": "SQLite DB",
+        "x": 1450,
+        "y": 1260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ui_stream_template",
+        "type": "ui-template",
+        "z": "427c0b64ee6ac87e",
+        "group": "group_stream_vivo",
+        "page": "",
+        "ui": "",
+        "name": "Video Stream",
+        "order": 1,
+        "width": 6,
+        "height": 5,
+        "format": "<template>\n    <div style=\"display:flex; align-items:center; justify-content:center; width:100%; height:100%;\">\n        <img v-if=\"streamActivo\" :src=\"streamUrl\"\n             style=\"max-width:100%; border-radius:8px; border:2px solid #ccc;\"\n             alt=\"ESP32-CAM Stream\" />\n        <div v-else style=\"color:#999; font-size:14px;\">📷 Cámara inactiva</div>\n    </div>\n</template>\n\n<script>\nexport default {\n    data() {\n        return {\n            streamActivo: false,\n            streamUrl: 'http://172.20.10.8/stream'\n        }\n    },\n    mounted() {\n        this.verificarRuta();\n        this.$watch(\n            () => this.$router?.currentRoute?.value?.path,\n            () => this.verificarRuta()\n        );\n    },\n    methods: {\n        verificarRuta() {\n            const ruta = this.$router?.currentRoute?.value?.path || '';\n            this.streamActivo = ruta.includes('/registro');\n        }\n    }\n}\n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 520,
+        "y": 1460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "nodo_form_registro_nuevo",
+        "type": "ui-form",
+        "z": "427c0b64ee6ac87e",
+        "name": "Formulario Registro",
+        "group": "group_formulario_train",
+        "label": "Datos del Nuevo Usuario",
+        "order": 2,
+        "width": 6,
+        "height": 3,
+        "options": [
+            {
+                "label": "Nombre Completo",
+                "key": "nombre",
+                "type": "text",
+                "required": true,
+                "rows": 1
+            }
+        ],
+        "formValue": {
+            "nombre": ""
+        },
+        "payload": "",
+        "submit": "💾 Guardar en Base de Datos",
+        "cancel": "Limpiar",
+        "resetOnSubmit": true,
+        "topic": "payload",
+        "topicType": "msg",
+        "splitLayout": false,
+        "className": "",
+        "x": 740,
+        "y": 1400,
+        "wires": [
+            [
+                "nodo_armar_train_nuevo"
+            ]
+        ]
+    },
+    {
+        "id": "nodo_armar_train_nuevo",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Preparar POST /train",
+        "func": "let nombre = msg.payload.nombre;\nlet imagen = flow.get('ultima_captura_b64');\n\nif (!nombre || nombre.trim() === '') {\n    return [null, { payload: \"⚠️ Escribe el nombre antes de registrar\" }];\n}\nif (!imagen) {\n    return [null, { payload: \"⚠️ Presiona primero el botón de Tomar Captura\" }];\n}\n\nlet base64Full = \"data:image/jpeg;base64,\" + imagen;\n\nmsg.payload = {\n    \"nombre\": nombre.trim(),\n    \"image\": base64Full\n};\nmsg.headers = { \"Content-Type\": \"application/json\" };\n\nreturn [msg, { payload: \"⌛ Procesando biometría en el servidor...\" }];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "x": 960,
+        "y": 1400,
+        "wires": [
+            [
+                "nodo_post_train_nuevo"
+            ],
+            [
+                "nodo_estado_registro_nuevo"
+            ]
+        ]
+    },
+    {
+        "id": "nodo_post_train_nuevo",
+        "type": "http request",
+        "z": "427c0b64ee6ac87e",
+        "name": "POST /train",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-ia:5000/train",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "senderr": false,
+        "headers": [],
+        "x": 1150,
+        "y": 1380,
+        "wires": [
+            [
+                "nodo_resp_train_nuevo"
+            ]
+        ]
+    },
+    {
+        "id": "nodo_resp_train_nuevo",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "Respuesta Train",
+        "func": "// Verifica si la respuesta del servidor fue exitosa\nif (msg.payload && msg.payload.success) {\n    // Éxito: se registró correctamente\n    msg.payload = {\n        texto: `✅ EXITOSO: ${msg.payload.nombre} registrado correctamente.`,\n        color: \"#2ecc71\",   // Verde\n        tipo: \"exito\"\n    };\n} else {\n    // Rechazo: mostrar el motivo del error\n    let motivo = msg.payload?.message || \"Error desconocido en el servidor\";\n    // Si hay lista de errores específicos (ej: \"No se detectó ningún rostro\")\n    if (msg.payload?.errores && msg.payload.errores.length > 0) {\n        motivo += \" - \" + msg.payload.errores.join(\", \");\n    }\n    msg.payload = {\n        texto: `❌ RECHAZADO: ${motivo}`,\n        color: \"#e74c3c\",   // Rojo\n        tipo: \"rechazo\"\n    };\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1320,
+        "y": 1380,
+        "wires": [
+            [
+                "nodo_estado_registro_nuevo"
+            ]
+        ]
+    },
+    {
+        "id": "nodo_estado_registro_nuevo",
+        "type": "ui-text",
+        "z": "427c0b64ee6ac87e",
+        "group": "group_formulario_train",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "Estado del Registro",
+        "label": "Estado:",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 14,
+        "color": "#000000",
+        "wrapText": true,
+        "className": "",
+        "value": "payload.texto",
+        "valueType": "msg",
+        "x": 1530,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "4b1da990d29b6b49",
+        "type": "telegram sender",
+        "z": "427c0b64ee6ac87e",
+        "name": "Enviar alerta",
+        "bot": "bot.telegram",
+        "haserroroutput": true,
+        "outputs": 2,
+        "x": 1200,
+        "y": 420,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "3981c3a44388b7b7",
+        "type": "http in",
+        "z": "427c0b64ee6ac87e",
+        "name": "",
+        "url": "/ultima-foto",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 380,
+        "y": 120,
+        "wires": [
+            [
+                "5443a0857a966d41"
+            ]
+        ]
+    },
+    {
+        "id": "5443a0857a966d41",
+        "type": "function",
+        "z": "427c0b64ee6ac87e",
+        "name": "function 2",
+        "func": "// Recupera el Base64 de la última captura\nlet b64 = flow.get('ultima_captura_b64');\n\nif (!b64) {\n    // Si no hay imagen, devuelve error 404\n    node.status({ fill: \"red\", shape: \"dot\", text: \"sin imagen\" });\n    msg.statusCode = 404;\n    msg.payload = \"No hay ninguna foto capturada aún\";\n    return msg;\n}\n\n// Convertir Base64 a Buffer\nlet imageBuffer = Buffer.from(b64, 'base64');\n\n// Configurar respuesta como imagen JPEG\nmsg.headers = {\n    'Content-Type': 'image/jpeg',\n    'Content-Disposition': 'inline; filename=\"ultima_captura.jpg\"'\n};\nmsg.payload = imageBuffer;\n\nnode.status({ fill: \"green\", shape: \"dot\", text: \"enviada\" });\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 120,
+        "wires": [
+            [
+                "c6530b8722eeac8d"
+            ]
+        ]
+    },
+    {
+        "id": "c6530b8722eeac8d",
+        "type": "http response",
+        "z": "427c0b64ee6ac87e",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 710,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "09cc69c47a6bed2f",
+        "type": "inject",
+        "z": "3bbd5d9ca8e6cdee",
         "name": "Limpiar DB",
         "props": [
             {
@@ -2687,14 +2833,14 @@
         "y": 220,
         "wires": [
             [
-                "347f2b9928515a52"
+                "b3769a89c2c26655"
             ]
         ]
     },
     {
-        "id": "148411690d8e431a",
+        "id": "a4af469f59dbf574",
         "type": "inject",
-        "z": "112319f8be4f42e5",
+        "z": "3bbd5d9ca8e6cdee",
         "name": "Iniciar BD",
         "props": [
             {
@@ -2716,14 +2862,14 @@
         "y": 280,
         "wires": [
             [
-                "1d2e4f828f6d2ac0"
+                "abd2953a815e9f98"
             ]
         ]
     },
     {
-        "id": "1d2e4f828f6d2ac0",
+        "id": "abd2953a815e9f98",
         "type": "sqlite",
-        "z": "112319f8be4f42e5",
+        "z": "3bbd5d9ca8e6cdee",
         "mydb": "a0244ea576e1de63",
         "sqlquery": "msg.topic",
         "sql": "",
@@ -2735,9 +2881,9 @@
         ]
     },
     {
-        "id": "347f2b9928515a52",
+        "id": "b3769a89c2c26655",
         "type": "sqlite",
-        "z": "112319f8be4f42e5",
+        "z": "3bbd5d9ca8e6cdee",
         "mydb": "a0244ea576e1de63",
         "sqlquery": "msg.topic",
         "sql": "",
