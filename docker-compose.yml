@@ -3,13 +3,16 @@ services:
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
+    user: root
     ports:
       - "1883:1883"        # Puerto MQTT estándar
+      - "8883:8883"        # Puerto MQTT TLS
       - "9001:9001"        # Puerto para WebSockets (opcional)
     volumes:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+      - ./mosquitto/certs:/mosquitto/config/certs
     networks:
       - red_iot
     restart: unless-stopped
@@ -39,7 +42,7 @@ services:
       - 8.8.8.8
       - 8.8.4.4
 
-  # NUEVO: Servicio de IA (Reconocimiento Facial)
+  # Servicio de IA (Reconocimiento Facial)
   api-ia:
     build:
       context: ./api-ia
@@ -56,7 +59,92 @@ services:
       - red_iot
     restart: unless-stopped
 
-# --- CONFIGURACIÓN DE RED PARA REPARAR EL HOTSPOT ---
+  # Servicio LLM Local (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+  # Base de datos de series de tiempo (InfluxDB)
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_ORG: smarthome
+      DOCKER_INFLUXDB_INIT_BUCKET: sensores
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: smarthome_token_2024
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin123
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+  # Dashboard y visualización (Grafana)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - influxdb
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+  # Orquestación de agente autónomo (n8n)
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_SECURE_COOKIE=false
+      - N8N_METRICS=false
+      - N8N_HOST=localhost
+    volumes:
+      - n8n_data:/home/node/.n8n
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+  # Predictor de series de tiempo
+  predictor:
+    build:
+      context: ./unidad3/predictor
+      dockerfile: Dockerfile
+    container_name: predictor
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "8883"
+      INFLUXDB_HOST: influxdb
+      INFLUXDB_TOKEN: smarthome_token_2024
+    depends_on:
+      - mosquitto
+      - influxdb
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+volumes:
+  ollama_data:
+  influxdb_data:
+  grafana_data:
+  n8n_data:
+
+# --- CONFIGURACIÓN DE RED ---
 networks:
   red_iot:
     driver: bridge

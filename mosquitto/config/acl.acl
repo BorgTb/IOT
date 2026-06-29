@@ -1,0 +1,17 @@
+user nodered
+topic readwrite smarthome/equipo1/#
+topic readwrite smarthome/equipo2/#
+
+user esp32_cam
+topic readwrite smarthome/equipo1/camara/#
+
+user mkr1000
+topic read smarthome/equipo2/control/#
+topic write smarthome/equipo2/alerta
+topic write smarthome/equipo2/gas
+topic write smarthome/equipo2/sonido
+topic write smarthome/equipo2/movimiento
+topic write smarthome/equipo2/led/state
+
+user predictor
+topic write smarthome/equipo2/prediccion/#
