@@ -1,0 +1,62 @@
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: webhook-nodered
+    receivers:
+      - uid: webhook_nodered_1
+        type: webhook
+        settings:
+          url: http://nodered:1880/grafana/alerta
+          httpMethod: POST
+
+policies:
+  - orgId: 1
+    receiver: webhook-nodered
+    group_by: ['grafana_folder', 'alertname']
+    group_wait: 10s
+    group_interval: 1m
+    repeat_interval: 5m
+
+groups:
+  - orgId: 1
+    name: smarthome-eval
+    folder: SmartHome
+    interval: 1m
+    rules:
+      - uid: gas_alto_rule
+        title: Gas alto (>400 ppm)
+        condition: C
+        for: 0m
+        noDataState: NoData
+        execErrState: Error
+        annotations:
+          summary: 'El nivel de gas supero el umbral de 400 ppm'
+        labels:
+          severity: critical
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: influxdb
+            model:
+              refId: A
+              query: 'from(bucket:"sensores") |> range(start: -10m) |> filter(fn:(r)=>r._measurement=="sensor" and r._field=="gas") |> last()'
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              refId: B
+              type: reduce
+              expression: A
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: B
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [400]

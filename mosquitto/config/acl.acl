@@ -15,3 +15,4 @@ topic write smarthome/equipo2/led/state
 
 user predictor
 topic write smarthome/equipo2/prediccion/#
+topic write smarthome/equipo2/alerta

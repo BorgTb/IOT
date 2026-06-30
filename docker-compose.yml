@@ -98,8 +98,13 @@ services:
       - "3000:3000"
     depends_on:
       - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./unidad3/grafana/provisioning:/etc/grafana/provisioning
+      - ./unidad3/grafana/dashboards:/var/lib/grafana/dashboards
     networks:
       - red_iot
     restart: unless-stopped
@@ -128,9 +133,15 @@ services:
     container_name: predictor
     environment:
       MQTT_BROKER: mosquitto
-      MQTT_PORT: "8883"
+      MQTT_PORT: "1883"
+      MQTT_USER: predictor
+      MQTT_PASS: predictor_iot
       INFLUXDB_HOST: influxdb
       INFLUXDB_TOKEN: smarthome_token_2024
+      INFLUXDB_ORG: smarthome
+      INFLUXDB_BUCKET: sensores
+      HORIZON_MIN: "30"
+      INTERVAL_MIN: "2"
     depends_on:
       - mosquitto
       - influxdb
