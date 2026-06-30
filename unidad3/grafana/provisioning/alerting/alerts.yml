@@ -25,13 +25,13 @@ groups:
     interval: 1m
     rules:
       - uid: gas_alto_rule
-        title: Gas alto (>400 ppm)
+        title: CO2 alto (>400 ppm)
         condition: C
         for: 0m
-        noDataState: NoData
+        noDataState: OK
         execErrState: Error
         annotations:
-          summary: 'El nivel de gas supero el umbral de 400 ppm'
+          summary: 'El nivel de CO2 (MQ7) supero el umbral de 400 ppm'
         labels:
           severity: critical
         data:
@@ -42,7 +42,7 @@ groups:
             datasourceUid: influxdb
             model:
               refId: A
-              query: 'from(bucket:"sensores") |> range(start: -10m) |> filter(fn:(r)=>r._measurement=="sensor" and r._field=="gas") |> last()'
+              query: 'from(bucket:"sensores") |> range(start: -10m) |> filter(fn:(r)=>r._measurement=="sensor" and r._field=="co2") |> last()'
           - refId: B
             datasourceUid: __expr__
             model:

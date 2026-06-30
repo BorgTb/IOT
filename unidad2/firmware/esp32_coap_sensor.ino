@@ -14,7 +14,7 @@ const char* password = "agu12355";
 
 // CoAP
 CoAPClient coap;
-IPAddress coapServer(172, 20, 10, 3); // Node-RED IP
+IPAddress coapServer(172, 20, 10, 3); // IP del host donde corre coap-bridge (puerto UDP 5683)
 const int coapPort = 5683;
 
 // DHT22

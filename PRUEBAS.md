@@ -25,13 +25,13 @@ Deben aparecer arriba: `mosquitto, nodered, ollama, influxdb, grafana, n8n, pred
 Publicar un dato de sensor simulado:
 ```bash
 docker exec mosquitto mosquitto_pub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
-  -t smarthome/equipo2/alerta -m '{"distancia": 45.3, "gas": 512, "sonido": 77}'
+  -t smarthome/equipo2/alerta -m '{"distancia": 45.3, "co2": 512, "sonido": 77}'
 ```
 Ver el gemelo actualizado:
 ```bash
 curl -s http://localhost:1880/gemelo/estado
 ```
-✅ Debe reflejar `gas`, `distancia`, `sonido` y crecer el `historial_1h`.
+✅ Debe reflejar `co2`, `distancia`, `sonido` y crecer el `historial_1h`.
 *(Si tienes el MKR1000 real encendido, los valores cambian solos cada 2s.)*
 
 ---
@@ -41,17 +41,17 @@ curl -s http://localhost:1880/gemelo/estado
 1. Abre http://localhost:1880/ui
 2. En **"Pregunta al sistema"** escribe, por ej.:
    - `Resume el estado del hogar en una frase`
-   - `¿Es seguro con estos niveles de gas?`
-3. La respuesta del LLM (Ollama, `qwen2.5:0.5b`) aparece abajo, usando los valores reales del gemelo.
+   - `¿Es seguro con estos niveles de co2?`
+3. La respuesta del LLM (Ollama, `llama3.2:3b`) aparece abajo, usando los valores reales del gemelo.
 
 ---
 
 ## 3. (U2) Controlador LLM automático
 
-Forzar una condición crítica (gas alto) para que el LLM decida:
+Forzar una condición crítica (co2 alto) para que el LLM decida:
 ```bash
 docker exec mosquitto mosquitto_pub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
-  -t smarthome/equipo2/alerta -m '{"gas": 520, "distancia": 50, "sonido": 40}'
+  -t smarthome/equipo2/alerta -m '{"co2": 520, "distancia": 50, "sonido": 40}'
 ```
 Observar los comandos de actuador (en otra terminal):
 ```bash
@@ -73,7 +73,7 @@ docker exec influxdb influx query \
  'from(bucket:"sensores")|>range(start:-10m)|>filter(fn:(r)=>r._measurement=="sensor")|>last()' \
  --org smarthome --token smarthome_token_2024
 ```
-✅ Devuelve filas para `gas`, `distancia`, `sonido`.
+✅ Devuelve filas para `co2`, `distancia`, `sonido`.
 
 ---
 
@@ -82,26 +82,26 @@ docker exec influxdb influx query \
 ```bash
 docker logs --tail 10 predictor
 ```
-✅ Líneas tipo `Prediccion gas 30min: 124.6 ppm ...`.
+✅ Líneas tipo `Prediccion co2 30min: 124.6 ppm ...`.
 
 La predicción llega al gemelo:
 ```bash
 curl -s http://localhost:1880/gemelo/estado
 ```
-✅ Campo `prediccion_30min.gas` con un número.
+✅ Campo `prediccion_30min.co2` con un número.
 
 ---
 
 ## 6. (U3) Grafana
 
 1. Abre http://localhost:3000 (admin/admin) → dashboard **"SmartHome IoT - Unidad 3"**.
-2. Paneles: Gas real vs predicción, Gas actual, Distancia/Sonido, Log del agente.
-3. Alerta: **Alerting → Alert rules** → debe estar **"Gas alto (>400 ppm)"**.
+2. Paneles: CO2 real vs predicción, CO2 actual, Distancia/Sonido, Log del agente.
+3. Alerta: **Alerting → Alert rules** → debe estar **"CO2 alto (>400 ppm)"**.
 
 Probar el webhook de la alerta manualmente:
 ```bash
 curl -s -X POST http://localhost:1880/grafana/alerta -H "Content-Type: application/json" \
-  -d '{"status":"firing","alerts":[{"labels":{"alertname":"Gas alto"}}]}' -w "\nHTTP %{http_code}\n"
+  -d '{"status":"firing","alerts":[{"labels":{"alertname":"CO2 alto"}}]}' -w "\nHTTP %{http_code}\n"
 ```
 ✅ HTTP 200, y la alerta queda en `gemelo.alertas_activas`.
 
@@ -120,10 +120,10 @@ docker exec influxdb influx query \
 ✅ Muestra `razonamiento`, `acciones`, `num`.
 
 ### Demo: forzar al agente a actuar
-1. Publica gas crítico:
+1. Publica co2 crítico:
 ```bash
 docker exec mosquitto mosquitto_pub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
-  -t smarthome/equipo2/alerta -m '{"gas": 600, "distancia": 50, "sonido": 40}'
+  -t smarthome/equipo2/alerta -m '{"co2": 600, "distancia": 50, "sonido": 40}'
 ```
 2. (opcional) Escucha los actuadores:
 ```bash

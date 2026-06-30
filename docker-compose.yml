@@ -24,8 +24,9 @@ services:
       dockerfile: Dockerfile
     container_name: nodered
     environment:
-      - TZ=America/Santiago  
+      - TZ=America/Santiago
       - NODE_OPTIONS=--dns-result-order=ipv4first
+      - CAMARA_URL=http://172.20.10.8/capture   # IP del ESP32-CAM (ajustar segun red)
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=1
       - net.ipv6.conf.default.disable_ipv6=1
@@ -33,6 +34,7 @@ services:
       - "1880:1880"        # Interfaz web de Node-RED
     volumes:
       - ./node-red-data:/data
+      - ./mosquitto/certs:/certs:ro   # CA para MQTT sobre TLS
     depends_on:
       - mosquitto
     networks:
@@ -121,6 +123,25 @@ services:
       - N8N_HOST=localhost
     volumes:
       - n8n_data:/home/node/.n8n
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+  # Puente CoAP -> MQTT (recibe del nodo sensor ESP32 de bajo consumo)
+  coap-bridge:
+    build:
+      context: ./unidad3/coap-bridge
+      dockerfile: Dockerfile
+    container_name: coap-bridge
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "1883"
+      MQTT_USER: coap
+      MQTT_PASS: coap_iot
+    ports:
+      - "5683:5683/udp"
+    depends_on:
+      - mosquitto
     networks:
       - red_iot
     restart: unless-stopped

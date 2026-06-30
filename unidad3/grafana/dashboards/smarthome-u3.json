@@ -4,14 +4,14 @@
   "tags": ["iot", "smarthome"],
   "timezone": "browser",
   "schemaVersion": 39,
-  "version": 1,
+  "version": 2,
   "refresh": "10s",
   "time": { "from": "now-6h", "to": "now" },
   "panels": [
     {
       "id": 1,
       "type": "timeseries",
-      "title": "Gas: real vs prediccion 30min",
+      "title": "CO2 (MQ7): real vs prediccion 30min",
       "datasource": { "type": "influxdb", "uid": "influxdb" },
       "gridPos": { "h": 9, "w": 16, "x": 0, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ppm", "custom": { "lineWidth": 2, "fillOpacity": 10 } }, "overrides": [] },
@@ -19,19 +19,19 @@
         {
           "refId": "A",
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"sensores\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"sensor\" and r._field == \"gas\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> set(key: \"_field\", value: \"gas_real\")\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])"
+          "query": "from(bucket: \"sensores\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"sensor\" and r._field == \"co2\")\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |> set(key: \"_field\", value: \"co2_real\")\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])"
         },
         {
           "refId": "B",
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"sensores\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"prediccion\" and r._field == \"gas\")\n  |> set(key: \"_field\", value: \"gas_prediccion\")\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])"
+          "query": "from(bucket: \"sensores\")\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |> filter(fn: (r) => r._measurement == \"prediccion\" and r._field == \"co2\")\n  |> set(key: \"_field\", value: \"co2_prediccion\")\n  |> keep(columns: [\"_time\", \"_value\", \"_field\"])"
         }
       ]
     },
     {
       "id": 2,
       "type": "stat",
-      "title": "Gas actual",
+      "title": "CO2 actual",
       "datasource": { "type": "influxdb", "uid": "influxdb" },
       "gridPos": { "h": 9, "w": 8, "x": 16, "y": 0 },
       "fieldConfig": { "defaults": { "unit": "ppm", "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 300 }, { "color": "red", "value": 400 } ] } }, "overrides": [] },
@@ -39,7 +39,7 @@
         {
           "refId": "A",
           "datasource": { "type": "influxdb", "uid": "influxdb" },
-          "query": "from(bucket: \"sensores\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"sensor\" and r._field == \"gas\")\n  |> last()"
+          "query": "from(bucket: \"sensores\")\n  |> range(start: -1h)\n  |> filter(fn: (r) => r._measurement == \"sensor\" and r._field == \"co2\")\n  |> last()"
         }
       ]
     },

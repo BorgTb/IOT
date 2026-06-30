@@ -10,11 +10,11 @@ contenedores con Docker Compose.
 
 ```
 [MKR1000 / ESP32-CAM]                         (sensores físicos + cámara)
-        │ MQTT (gas, distancia, sonido, eventos)
+        │ MQTT (co2, distancia, sonido, eventos)
         ▼
    ┌──────────┐   escribe    ┌──────────┐    consulta    ┌──────────┐
    │ Mosquitto│─────────────▶│ Node-RED │───────────────▶│  Ollama  │ (LLM local)
-   │  (broker)│              │  Gemelo  │   prompt/JSON   │qwen2.5   │
+   │  (broker)│              │  Gemelo  │   prompt/JSON   │llama3.2  │
    └──────────┘              │  Digital │◀───────────────└──────────┘
         ▲  ▲                 │ + API    │   decisión
         │  │                 │ REST     │
@@ -23,7 +23,7 @@ contenedores con Docker Compose.
         │  │                      ▼
         │  │                 ┌──────────┐   query 6h   ┌──────────┐
         │  └─────────────────│ InfluxDB │◀─────────────│ Predictor│ (numpy.polyfit)
-        │   predicción MQTT  │ (TS DB)  │─────────────▶│  gas/dist│
+        │   predicción MQTT  │ (TS DB)  │─────────────▶│  co2/dist│
         │                    └────┬─────┘   escribe     └──────────┘
         │                         │ datasource
         │                         ▼
@@ -43,12 +43,13 @@ contenedores con Docker Compose.
 |---|---|---|
 | `mosquitto` | 1883 / 8883 | Broker MQTT (auth + TLS + ACLs) |
 | `nodered` | 1880 | Gemelo digital, lógica LLM, API REST, dashboard |
-| `ollama` | 11434 | LLM local (`qwen2.5:0.5b`) |
+| `ollama` | 11434 | LLM local (`llama3.2:3b`) |
 | `influxdb` | 8086 | Base de datos de series de tiempo |
 | `grafana` | 3000 | Dashboards + alertas |
 | `n8n` | 5678 | Agente autónomo |
 | `predictor` | — | Script Python de predicción (cada 2 min) |
-| `api-ia` | 5000 | Reconocimiento facial (ESP32-CAM) |
+| `coap-bridge` | 5683/udp | Servidor CoAP (`aiocoap`) que redirige a MQTT |
+| `api-ia` | 5000 | Reconocimiento facial (ESP32-CAM → persona) |
 
 ---
 
@@ -60,10 +61,11 @@ contenedores con Docker Compose.
 
 ```bash
 docker compose up -d ollama
-docker exec ollama ollama pull qwen2.5:0.5b
+docker exec ollama ollama pull llama3.2:3b
 ```
-> Para mejores respuestas (recomendado para la defensa): `docker exec ollama ollama pull llama3.2:3b`
-> y cambiar el nombre del modelo en los flujos de Node-RED y en el workflow de n8n.
+> `llama3.2:3b` (~2GB) es el modelo configurado en todos los flujos (Node-RED y n8n);
+> da buenas respuestas en español. Si tu equipo es muy limitado puedes bajar a
+> `qwen2.5:0.5b` (más rápido pero respuestas pobres) cambiando el `model` en los flujos.
 
 ### Levantar todo
 ```bash
@@ -105,11 +107,13 @@ docker compose down -v       # borra también los volúmenes
 
 ### Unidad 2 — Protocolos, seguridad y LLM
 - ✅ **MQTT con auth** (`mosquitto_passwd`) + **TLS** en 8883 + **ACLs** por cliente.
+  Node-RED conecta al broker por **TLS (`mqtts://mosquitto:8883`)**.
 - ✅ **LLM local (Ollama)** como controlador: Node-RED arma el prompt con el estado del
-  hogar, llama a `/api/generate` con `format:json`, parsea y publica decisión/comandos MQTT.
-- ✅ **Consulta en lenguaje natural** en el dashboard (`/ui`).
-- ⚠️ **CoAP**: firmware listo (`esp32/esp32_coap_sensor.ino`), falta el nodo
-  `node-red-contrib-coap` para integrarlo (pendiente).
+  hogar, llama a `/api/generate` con `format:json`, parsea y publica decisión/comandos MQTT
+  (a `smarthome/equipo2/...`).
+- ✅ **Consulta en lenguaje natural** en el dashboard (`/ui`), publica a `llm/respuesta`.
+- ✅ **CoAP**: nodo sensor (`esp32/esp32_coap_sensor.ino`) → servicio **`coap-bridge`**
+  (`aiocoap`, UDP 5683) que redirige los recursos CoAP al broker MQTT.
 
 ### Unidad 3 — Gemelo digital, predicción y agente
 - ✅ **Gemelo digital** como objeto JSON con historial + API REST `GET /gemelo/estado`.
@@ -117,7 +121,7 @@ docker compose down -v       # borra también los volúmenes
 - ✅ **Predictor** (`unidad3/predictor/predict.py`): regresión lineal a 30 min sobre datos
   reales, publica a MQTT + gemelo + InfluxDB (measurement `prediccion`).
 - ✅ **Grafana**: datasource + dashboard *"SmartHome IoT - Unidad 3"* (histórico,
-  predicción superpuesta, estado, log del agente) + **alerta** "Gas alto (>400 ppm)".
+  predicción superpuesta, estado, log del agente) + **alerta** "CO2 alto (>400 ppm)".
 - ✅ **Agente autónomo n8n** (`unidad3/n8n/agente-autonomo.json`): cada 2 min consulta el
   gemelo, razona con el LLM, ejecuta acciones en cadena (actuadores vía Node-RED) y
   registra el log en InfluxDB.
@@ -131,7 +135,7 @@ docker compose down -v       # borra también los volúmenes
 **Inyectar un dato de sensor y verlo propagarse:**
 ```bash
 docker exec mosquitto mosquitto_pub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
-  -t smarthome/equipo2/alerta -m '{"distancia":45,"gas":512,"sonido":77}'
+  -t smarthome/equipo2/alerta -m '{"distancia":45,"co2":512,"sonido":77}'
 curl -s http://localhost:1880/gemelo/estado
 ```
 
@@ -139,14 +143,14 @@ curl -s http://localhost:1880/gemelo/estado
 
 **Predictor:**
 ```bash
-docker logs --tail 5 predictor          # -> "Prediccion gas 30min: ... ppm"
+docker logs --tail 5 predictor          # -> "Prediccion co2 30min: ... ppm"
 ```
 
 **Agente actuando en cadena (lo más vistoso):**
 ```bash
-# fuerza gas crítico
+# fuerza co2 crítico
 docker exec mosquitto mosquitto_pub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
-  -t smarthome/equipo2/alerta -m '{"gas":600,"distancia":50,"sonido":40}'
+  -t smarthome/equipo2/alerta -m '{"co2":600,"distancia":50,"sonido":40}'
 # escucha actuadores (deja corriendo en otra terminal)
 docker exec mosquitto mosquitto_sub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
   -t 'smarthome/equipo2/control/#' -v
@@ -195,9 +199,11 @@ docker exec influxdb influx query \
 
 - **El gemelo muestra valores por defecto:** ocurre justo tras reiniciar Node-RED; se
   refresca con el siguiente mensaje de sensor (cada 2 s si el MKR1000 está encendido).
-- **El agente responde texto raro:** `qwen2.5:0.5b` es muy pequeño; igual parsea JSON
-  válido. Usa `llama3.2:3b` para respuestas más limpias.
-- **El agente solo acciona en condición crítica** (gas > 400, sonido > 80, distancia < 20).
+- **Sensores reales (4):** CO2 (MQ7), nivel de sonido, distancia ultrasónica, y la
+  ESP32-CAM (detección de persona + reconocimiento facial vía `api-ia`).
+- **El agente solo acciona en condición crítica** (co2 > 400, sonido > 80, distancia < 20).
+- **MKR1000 con firmware viejo:** si aún publica `gas` en vez de `co2`, Node-RED lo acepta
+  igual (mapea `gas`→`co2`); reflashea el firmware para que publique `co2` directamente.
 - **Tópicos de control:** los sensores/actuadores reales del MKR1000 usan `equipo2`; el
   endpoint `/agente/accion` y el agente publican en `smarthome/equipo2/control/...`.
 - **Reimportar el agente n8n** (si se borra):

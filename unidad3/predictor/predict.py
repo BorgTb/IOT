@@ -4,6 +4,8 @@ Lee el historial de sensores desde InfluxDB (measurement "sensor"),
 proyecta a 30 min con regresion lineal (numpy.polyfit), publica la
 prediccion por MQTT y la guarda en InfluxDB (measurement "prediccion")
 para que Grafana superponga real vs. proyeccion.
+
+Sensores reales del proyecto: CO2 (MQ7), sonido, distancia ultrasonica.
 """
 
 import os
@@ -25,11 +27,11 @@ INFLUX_TOKEN = os.getenv("INFLUXDB_TOKEN", "smarthome_token_2024")
 INFLUX_ORG = os.getenv("INFLUXDB_ORG", "smarthome")
 INFLUX_BUCKET = os.getenv("INFLUXDB_BUCKET", "sensores")
 
-TOPIC_PRED_GAS = "smarthome/equipo2/prediccion/gas"
+TOPIC_PRED_CO2 = "smarthome/equipo2/prediccion/co2"
 TOPIC_PRED_DIST = "smarthome/equipo2/prediccion/distancia"
 TOPIC_ALERTA = "smarthome/equipo2/alerta"
 
-UMBRAL_GAS = float(os.getenv("UMBRAL_GAS", "400"))
+UMBRAL_CO2 = float(os.getenv("UMBRAL_CO2", "400"))
 HORIZON_MIN = int(os.getenv("HORIZON_MIN", "30"))
 INTERVAL_MIN = int(os.getenv("INTERVAL_MIN", "10"))
 
@@ -89,32 +91,32 @@ def write_pred_influx(field, valor):
 
 
 def ciclo(client):
-    # --- GAS ---
-    gas = query_serie("gas")
-    if len(gas) < 3:
-        print("Pocos datos reales de gas, usando datos sinteticos", flush=True)
-        gas = sintetico(350, 50, 2)
+    # --- CO2 (MQ7) ---
+    co2 = query_serie("co2")
+    if len(co2) < 3:
+        print("Pocos datos reales de CO2, usando datos sinteticos", flush=True)
+        co2 = sintetico(350, 50, 2)
 
-    pred_gas, pend_gas, actual_gas = predecir(gas, HORIZON_MIN)
+    pred_co2, pend_co2, actual_co2 = predecir(co2, HORIZON_MIN)
     now = datetime.now().isoformat()
 
-    if pred_gas is not None:
-        msg = {"valor": round(pred_gas, 1), "horizon_min": HORIZON_MIN,
-               "pendiente": round(pend_gas, 3), "timestamp": now}
-        client.publish(TOPIC_PRED_GAS, json.dumps(msg))
-        write_pred_influx("gas", round(pred_gas, 1))
-        print(f"Prediccion gas {HORIZON_MIN}min: {pred_gas:.1f} ppm "
-              f"(actual {actual_gas:.0f}, pendiente {pend_gas:.2f})", flush=True)
+    if pred_co2 is not None:
+        msg = {"valor": round(pred_co2, 1), "horizon_min": HORIZON_MIN,
+               "pendiente": round(pend_co2, 3), "timestamp": now}
+        client.publish(TOPIC_PRED_CO2, json.dumps(msg))
+        write_pred_influx("co2", round(pred_co2, 1))
+        print(f"Prediccion CO2 {HORIZON_MIN}min: {pred_co2:.1f} ppm "
+              f"(actual {actual_co2:.0f}, pendiente {pend_co2:.2f})", flush=True)
 
         # Alerta preventiva: superara el umbral aunque ahora este por debajo
-        if pred_gas > UMBRAL_GAS and actual_gas <= UMBRAL_GAS:
+        if pred_co2 > UMBRAL_CO2 and actual_co2 <= UMBRAL_CO2:
             alerta = {
                 "tipo": "preventiva",
-                "sensor": "gas",
-                "valor_actual": round(actual_gas, 1),
-                "prediccion": round(pred_gas, 1),
+                "sensor": "co2",
+                "valor_actual": round(actual_co2, 1),
+                "prediccion": round(pred_co2, 1),
                 "horizonte_min": HORIZON_MIN,
-                "mensaje": f"Gas podria alcanzar {pred_gas:.0f} ppm en {HORIZON_MIN} min"
+                "mensaje": f"CO2 podria alcanzar {pred_co2:.0f} ppm en {HORIZON_MIN} min"
             }
             client.publish(TOPIC_ALERTA, json.dumps(alerta))
             print(f"ALERTA preventiva: {alerta['mensaje']}", flush=True)
