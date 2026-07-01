@@ -3,9 +3,9 @@
 #include <PubSubClient.h>
 
 // CONFIGURACION DE WI-FI Y MQTT
-const char* ssid = "Casa_Meza";
-const char* password = "18351835";
-const char* mqtt_server = "192.168.1.8";
+const char* ssid = "iPhoneTintin";
+const char* password = "agu12355";
+const char* mqtt_server = "172.20.10.3";
 const int mqtt_port = 1883;
 
 // CREDENCIALES MQTT
