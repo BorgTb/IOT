@@ -2,17 +2,29 @@
   "id": "agenteiotautonomo01",
   "name": "Agente IoT Autonomo",
   "active": false,
-  "settings": { "executionOrder": "v1" },
+  "settings": {
+    "executionOrder": "v1"
+  },
   "nodes": [
     {
       "parameters": {
-        "rule": { "interval": [ { "field": "minutes", "minutesInterval": 2 } ] }
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
       },
       "id": "a1trigger",
       "name": "Cada 2 minutos",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1.2,
-      "position": [ 200, 300 ]
+      "position": [
+        200,
+        300
+      ]
     },
     {
       "parameters": {
@@ -23,17 +35,23 @@
       "name": "Obtener Gemelo",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [ 420, 300 ]
+      "position": [
+        420,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const g = $input.first().json;\nconst e = g.estado_actual || {};\nconst ctx = JSON.stringify({estado_actual: e, prediccion_30min: g.prediccion_30min, alertas_activas: g.alertas_activas, resumen_llm: g.resumen_llm});\nconst prompt = `Eres un agente de control de un hogar inteligente.\nTienes disponibles estas herramientas:\n- activar_actuador(dispositivo, estado)  // dispositivo: led o buzzer\n- enviar_notificacion(mensaje)\n- registrar_evento(descripcion)\n\nEstado del gemelo digital (JSON): ${ctx}\n\nSensores reales: CO2 (MQ7), sonido, distancia, y camara con reconocimiento facial.\nUmbrales: CO2 critico > 400 ppm, sonido alto > 80 dB, distancia baja < 20 cm.\nDecide que acciones ejecutar. Responde SOLO en JSON con esta estructura:\n{\\\"acciones\\\":[{\\\"herramienta\\\":\\\"activar_actuador\\\",\\\"parametros\\\":{\\\"dispositivo\\\":\\\"led\\\",\\\"estado\\\":true}}],\\\"razonamiento\\\":\\\"...\\\"}`;\nreturn [{ json: { model: 'llama3.2:3b', prompt: prompt, stream: false, format: 'json' } }];"
+        "jsCode": "const g = $input.first().json;\nconst e = g.estado_actual || {};\nconst u = g.umbrales || { co2:{limite:400}, sonido:{limite:80}, distancia:{limite:20} };\n\n// El sistema evalua las condiciones de forma deterministica (no el LLM)\nconst alertas = [];\nif (typeof e.co2 === 'number' && e.co2 > u.co2.limite) alertas.push(\"CO2 alto: \" + e.co2 + \" supera el umbral de \" + u.co2.limite + \" ppm\");\nif (typeof e.sonido === 'number' && e.sonido > u.sonido.limite) alertas.push(\"Sonido alto: \" + e.sonido + \" supera el umbral de \" + u.sonido.limite + \" dB\");\nif (typeof e.distancia === 'number' && e.distancia < u.distancia.limite) alertas.push(\"Distancia baja: \" + e.distancia + \" por debajo del umbral de \" + u.distancia.limite + \" cm\");\n\nconst condiciones = alertas.length ? alertas.join(\"; \") : \"NINGUNA - todos los valores estan dentro del rango seguro\";\n\nlet prompt = \"Eres un agente de control de un hogar inteligente. Herramientas disponibles:\\n\";\nprompt += \"- activar_actuador(dispositivo, estado)  // dispositivo: led o buzzer\\n\";\nprompt += \"- enviar_notificacion(mensaje)\\n\";\nprompt += \"- registrar_evento(descripcion)\\n\\n\";\nprompt += \"Lecturas actuales de los sensores:\\n\";\nprompt += \"- CO2: \" + e.co2 + \" ppm (umbral critico: mayor a \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Sonido: \" + e.sonido + \" dB (umbral critico: mayor a \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: menor a \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + \"\\n\\n\";\nprompt += \"CONDICIONES DE ALERTA YA EVALUADAS POR EL SISTEMA: \" + condiciones + \"\\n\\n\";\nprompt += \"REGLAS OBLIGATORIAS:\\n\";\nprompt += \"1. Actua SOLO si en las condiciones ya evaluadas hay al menos una alerta real.\\n\";\nprompt += \"2. Si las condiciones dicen 'NINGUNA', tu respuesta DEBE ser exactamente: {\\\"acciones\\\":[],\\\"razonamiento\\\":\\\"Todos los valores dentro del rango seguro, no se requieren acciones.\\\"}\\n\";\nprompt += \"3. Prohibido inventar valores, condiciones o umbrales distintos a los indicados arriba.\\n\";\nprompt += \"4. El razonamiento debe citar solo las condiciones reales listadas arriba.\\n\\n\";\nprompt += \"Responde SOLO en JSON con esta estructura:\\n\";\nprompt += \"{\\\"acciones\\\":[{\\\"herramienta\\\":\\\"activar_actuador\\\",\\\"parametros\\\":{\\\"dispositivo\\\":\\\"led\\\",\\\"estado\\\":true}}],\\\"razonamiento\\\":\\\"...\\\"}\";\n\nreturn [{ json: { model: 'llama3.2:3b', prompt: prompt, stream: false, format: 'json' } }];\n"
       },
       "id": "a3prompt",
       "name": "Construir Prompt",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [ 640, 300 ]
+      "position": [
+        640,
+        300
+      ]
     },
     {
       "parameters": {
@@ -48,23 +66,69 @@
       "name": "Razonar (Ollama)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [ 860, 300 ]
+      "position": [
+        860,
+        300
+      ]
     },
     {
       "parameters": {
-        "jsCode": "const resp = $json.response || $json.data || '';\nlet decision;\ntry { decision = JSON.parse(resp); } catch(err) { decision = { acciones: [], razonamiento: 'error parse: ' + String(resp).slice(0,150) }; }\nconst acciones = decision.acciones || [];\nconst ejecutadas = [];\nfor (const acc of acciones) {\n  const tool = acc.herramienta || acc.tool;\n  const p = acc.parametros || acc.params || {};\n  if (tool === 'activar_actuador') {\n    try {\n      await this.helpers.httpRequest({ method:'POST', url:'http://nodered:1880/agente/accion', body:{dispositivo:p.dispositivo, estado:p.estado}, json:true });\n      ejecutadas.push('actuador ' + p.dispositivo + '=' + p.estado);\n    } catch(err) { ejecutadas.push('error actuador: ' + err.message); }\n  } else if (tool === 'enviar_notificacion') {\n    ejecutadas.push('notif: ' + (p.mensaje||''));\n  } else if (tool === 'registrar_evento') {\n    ejecutadas.push('evento: ' + (p.descripcion||''));\n  }\n}\nconst raz = String(decision.razonamiento||'').replace(/\"/g,\"'\").slice(0,200);\nconst accStr = (ejecutadas.join(' | ')||'ninguna').replace(/\"/g,\"'\").slice(0,200);\nconst line = 'agente razonamiento=\"'+raz+'\",acciones=\"'+accStr+'\",num='+acciones.length;\ntry {\n  await this.helpers.httpRequest({ method:'POST', url:'http://influxdb:8086/api/v2/write?org=smarthome&bucket=sensores&precision=s', headers:{'Authorization':'Token smarthome_token_2024','Content-Type':'text/plain'}, body: line });\n} catch(err) {}\nreturn [{ json: { razonamiento: decision.razonamiento, acciones_ejecutadas: ejecutadas, total: acciones.length } }];"
+        "jsCode": "const resp = $json.response || $json.data || '';\nlet decision;\ntry { decision = JSON.parse(resp); } catch(err) { decision = { acciones: [], razonamiento: 'error parse: ' + String(resp).slice(0,150) }; }\nconst acciones = decision.acciones || [];\nconst ejecutadas = [];\nfor (const acc of acciones) {\n  const tool = acc.herramienta || acc.tool;\n  const p = acc.parametros || acc.params || {};\n  if (tool === 'activar_actuador') {\n    try {\n      await this.helpers.httpRequest({ method:'POST', url:'http://nodered:1880/agente/accion', body:{dispositivo:p.dispositivo, estado:p.estado}, json:true });\n      ejecutadas.push('actuador ' + p.dispositivo + '=' + p.estado);\n    } catch(err) { ejecutadas.push('error actuador: ' + err.message); }\n  } else if (tool === 'enviar_notificacion') {\n    ejecutadas.push('notif: ' + (p.mensaje||''));\n  } else if (tool === 'registrar_evento') {\n    ejecutadas.push('evento: ' + (p.descripcion||''));\n  }\n}\nconst raz = String(decision.razonamiento||'').replace(/\"/g,\"'\").slice(0,200);\nconst accStr = (ejecutadas.join(' | ')||'ninguna').replace(/\"/g,\"'\").slice(0,200);\nconst line = 'agente razonamiento=\"'+raz+'\",acciones=\"'+accStr+'\",num='+acciones.length;\ntry {\n  await this.helpers.httpRequest({ method:'POST', url:'http://influxdb:8086/api/v2/write?org=smarthome&bucket=sensores&precision=s', headers:{'Authorization':'Token smarthome_token_2024','Content-Type':'text/plain'}, body: line });\n} catch(err) {}\nreturn [{ json: { razonamiento: decision.razonamiento, acciones_ejecutadas: ejecutadas, total: acciones.length } }];\n"
       },
       "id": "a5exec",
       "name": "Ejecutar Acciones",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [ 1080, 300 ]
+      "position": [
+        1080,
+        300
+      ]
     }
   ],
   "connections": {
-    "Cada 2 minutos": { "main": [ [ { "node": "Obtener Gemelo", "type": "main", "index": 0 } ] ] },
-    "Obtener Gemelo": { "main": [ [ { "node": "Construir Prompt", "type": "main", "index": 0 } ] ] },
-    "Construir Prompt": { "main": [ [ { "node": "Razonar (Ollama)", "type": "main", "index": 0 } ] ] },
-    "Razonar (Ollama)": { "main": [ [ { "node": "Ejecutar Acciones", "type": "main", "index": 0 } ] ] }
+    "Cada 2 minutos": {
+      "main": [
+        [
+          {
+            "node": "Obtener Gemelo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Obtener Gemelo": {
+      "main": [
+        [
+          {
+            "node": "Construir Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construir Prompt": {
+      "main": [
+        [
+          {
+            "node": "Razonar (Ollama)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Razonar (Ollama)": {
+      "main": [
+        [
+          {
+            "node": "Ejecutar Acciones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
   }
 }
