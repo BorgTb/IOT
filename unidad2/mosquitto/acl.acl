@@ -16,6 +16,7 @@ topic write smarthome/equipo2/led/state
 user predictor
 topic write smarthome/equipo2/prediccion/#
 topic write smarthome/equipo2/alerta
+topic read smarthome/equipo2/umbrales/#
 
 user coap
 topic write smarthome/equipo2/temperatura
