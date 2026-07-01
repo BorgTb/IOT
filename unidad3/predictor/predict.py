@@ -130,10 +130,28 @@ def ciclo(client):
             write_pred_influx("distancia", round(pred_d, 1))
 
 
+def on_message(client, userdata, msg):
+    """Actualiza el umbral de CO2 cuando el chat lo cambia (topico retenido)."""
+    global UMBRAL_CO2
+    try:
+        data = json.loads(msg.payload.decode("utf-8"))
+        if "limite" in data:
+            UMBRAL_CO2 = float(data["limite"])
+            print(f"Umbral CO2 actualizado a {UMBRAL_CO2} ppm (configurado desde el chat)", flush=True)
+    except Exception as e:
+        print(f"Error procesando umbral: {e}", flush=True)
+
+
+def on_connect(client, userdata, flags, rc, props=None):
+    print(f"MQTT conectado rc={rc}", flush=True)
+    client.subscribe("smarthome/equipo2/umbrales/co2")
+
+
 def main():
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
     client.username_pw_set(USER, PASS)
-    client.on_connect = lambda c, u, flags, rc, props=None: print(f"MQTT conectado rc={rc}", flush=True)
+    client.on_connect = on_connect
+    client.on_message = on_message
 
     while True:
         try:

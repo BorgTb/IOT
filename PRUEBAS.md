@@ -46,6 +46,30 @@ curl -s http://localhost:1880/gemelo/estado
 
 ---
 
+## 2b. (U2) Configurar umbrales de alerta por chat
+
+Los límites críticos de **CO2, sonido y distancia** son configurables desde el chat
+(la detección de persona/rostro no tiene umbral). En http://localhost:1880/ui escribe:
+- `Deja el límite del CO2 en 70 como crítico`
+- `Pon el umbral de sonido en 65`
+- `Cambia la distancia crítica a 15`
+
+El sistema responde confirmando (ej. *"Listo. El límite crítico de CO2 quedó en 70 ppm.
+A partir de ahora se considera peligroso por encima de 70 ppm."*) y a partir de ahí:
+- El **controlador LLM** y las `alertas_activas` usan ese límite.
+- El **predictor** ajusta su alerta preventiva de CO2.
+- El umbral se **publica retenido** en `smarthome/equipo2/umbrales/<sensor>` y persiste
+  al reiniciar.
+
+Verificar el umbral vigente:
+```bash
+curl -s http://localhost:1880/gemelo/estado | python -c "import sys,json;print(json.load(sys.stdin)['umbrales'])"
+```
+Preguntas normales (ej. *"¿es seguro el CO2?"*) siguen respondiéndose con el LLM y tienen
+en cuenta el umbral configurado.
+
+---
+
 ## 3. (U2) Controlador LLM automático
 
 Forzar una condición crítica (co2 alto) para que el LLM decida:

@@ -230,7 +230,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Crear Gemelo Digital",
-        "func": "var gemelo = {\n    \"ultimo_update\": new Date().toISOString(),\n    \"estado_actual\": {\n        \"co2\": 200,\n        \"distancia\": 100,\n        \"sonido\": 30,\n        \"persona\": false,\n        \"persona_reconocida\": false,\n        \"persona_nombre\": null,\n        \"led\": false,\n        \"buzzer\": false\n    },\n    \"historial_1h\": [],\n    \"alertas_activas\": [],\n    \"prediccion_30min\": {\n        \"co2\": null,\n        \"distancia\": null\n    },\n    \"resumen_llm\": \"Sistema iniciado\"\n};\nglobal.set(\"gemelo\", gemelo);\nnode.status({fill:\"green\",shape:\"dot\",text:\"Gemelo activo\"});\nreturn null;",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (gemelo && gemelo.estado_actual) { node.status({fill:\"green\",shape:\"dot\",text:\"Gemelo ya activo\"}); return null; }\ngemelo = {\n    \"ultimo_update\": new Date().toISOString(),\n    \"estado_actual\": {\n        \"co2\": 200,\n        \"distancia\": 100,\n        \"sonido\": 30,\n        \"persona\": false,\n        \"persona_reconocida\": false,\n        \"persona_nombre\": null,\n        \"led\": false,\n        \"buzzer\": false\n    },\n    \"umbrales\": {\n        \"co2\": { \"limite\": 400, \"direccion\": \"mayor\", \"unidad\": \"ppm\" },\n        \"sonido\": { \"limite\": 80, \"direccion\": \"mayor\", \"unidad\": \"dB\" },\n        \"distancia\": { \"limite\": 20, \"direccion\": \"menor\", \"unidad\": \"cm\" }\n    },\n    \"historial_1h\": [],\n    \"alertas_activas\": [],\n    \"prediccion_30min\": {\n        \"co2\": null,\n        \"distancia\": null\n    },\n    \"resumen_llm\": \"Sistema iniciado\"\n};\nvar persist = global.get(\"umbrales_persistidos\");\nif (persist) { for (var s in persist) { if (gemelo.umbrales[s]) gemelo.umbrales[s].limite = persist[s]; } }\nglobal.set(\"gemelo\", gemelo);\nnode.status({fill:\"green\",shape:\"dot\",text:\"Gemelo activo\"});\nreturn null;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -286,7 +286,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Evaluar si LLM debe actuar",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\nvar estado = gemelo.estado_actual;\n\nvar debeActuar = false;\nvar razon = \"\";\n\nif (estado.co2 > 400) { debeActuar = true; razon = \"CO2 alto\"; }\nelse if (estado.sonido > 80) { debeActuar = true; razon = \"Sonido alto\"; }\nelse if (estado.distancia < 20) { debeActuar = true; razon = \"Distancia baja\"; }\n\nif (debeActuar) {\n    var ultimaAccion = flow.get(\"ultima_accion_llm\") || 0;\n    var ahora = Date.now();\n    if (ahora - ultimaAccion > 30000) {\n        flow.set(\"ultima_accion_llm\", ahora);\n        return { payload: { debeActuar: true, razon: razon } };\n    }\n}\nreturn { payload: { debeActuar: false } };",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\nvar estado = gemelo.estado_actual;\nvar u = gemelo.umbrales || { co2:{limite:400}, sonido:{limite:80}, distancia:{limite:20} };\n\nvar debeActuar = false;\nvar razon = \"\";\nvar activas = [];\n\nif (estado.co2 > u.co2.limite) { activas.push(\"CO2 alto (\" + estado.co2 + \" > \" + u.co2.limite + \" ppm)\"); if(!debeActuar){debeActuar=true;razon=\"CO2 supera el umbral (\"+u.co2.limite+\" ppm)\";} }\nif (estado.sonido > u.sonido.limite) { activas.push(\"Sonido alto (\" + estado.sonido + \" > \" + u.sonido.limite + \" dB)\"); if(!debeActuar){debeActuar=true;razon=\"Sonido supera el umbral (\"+u.sonido.limite+\" dB)\";} }\nif (estado.distancia < u.distancia.limite) { activas.push(\"Distancia baja (\" + estado.distancia + \" < \" + u.distancia.limite + \" cm)\"); if(!debeActuar){debeActuar=true;razon=\"Distancia por debajo del umbral (\"+u.distancia.limite+\" cm)\";} }\n\ngemelo.alertas_activas = activas;\nglobal.set(\"gemelo\", gemelo);\n\nif (debeActuar) {\n    var ultimaAccion = flow.get(\"ultima_accion_llm\") || 0;\n    var ahora = Date.now();\n    if (ahora - ultimaAccion > 30000) {\n        flow.set(\"ultima_accion_llm\", ahora);\n        return { payload: { debeActuar: true, razon: razon } };\n    }\n}\nreturn { payload: { debeActuar: false } };",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -305,7 +305,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Construir Prompt LLM",
-        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral de alerta: 400 ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    activar_buzzer: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
+        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    activar_buzzer: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -519,14 +519,88 @@
         "height": 0,
         "passthru": true,
         "mode": "text",
-        "delay": 300,
+        "delay": 0,
         "topic": "consulta_natural",
         "x": 130,
         "y": 80,
         "wires": [
             [
-                "gemelo.consulta.llm"
+                "gemelo.umbral.detect"
             ]
+        ]
+    },
+    {
+        "id": "gemelo.umbral.detect",
+        "type": "function",
+        "z": "gemelo.consulta.natural",
+        "name": "Detectar comando de umbral",
+        "func": "var texto = String(msg.payload || \"\").toLowerCase();\nvar gemelo = global.get(\"gemelo\");\nif (!gemelo) return [null, null];\nif (!gemelo.umbrales) gemelo.umbrales = { co2:{limite:400,direccion:\"mayor\",unidad:\"ppm\"}, sonido:{limite:80,direccion:\"mayor\",unidad:\"dB\"}, distancia:{limite:20,direccion:\"menor\",unidad:\"cm\"} };\n\nvar esComando = /(l[ií]mite|umbral|cr[ií]tic|peligros|establece|pon|deja|cambia|configura|ajusta|fija|setea)/.test(texto);\nvar sensor = null;\nif (/(co2|gas|di[oó]xido|mq7)/.test(texto)) sensor = \"co2\";\nelse if (/(sonido|ruido|decibel)/.test(texto)) sensor = \"sonido\";\nelse if (/(distancia|proximidad|cercan)/.test(texto)) sensor = \"distancia\";\n\nvar m = texto.match(/\\b(\\d+(?:[.,]\\d+)?)\\b/);\nvar valor = m ? parseFloat(m[1].replace(\",\", \".\")) : null;\n\nif (esComando && sensor && valor !== null && !isNaN(valor)) {\n    gemelo.umbrales[sensor].limite = valor;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    var un = gemelo.umbrales[sensor].unidad;\n    var dir = gemelo.umbrales[sensor].direccion === \"menor\" ? \"por debajo de\" : \"por encima de\";\n    var nombre = sensor === \"co2\" ? \"CO2\" : sensor;\n    msg.payload = \"Listo. El limite critico de \" + nombre + \" quedo en \" + valor + \" \" + un + \". A partir de ahora se considera peligroso \" + dir + \" \" + valor + \" \" + un + \".\";\n    node.status({fill:\"blue\",shape:\"dot\",text:nombre + \" = \" + valor});\n    var umbralMsg = { topic: \"smarthome/equipo2/umbrales/\" + sensor, payload: JSON.stringify({ limite: valor, direccion: gemelo.umbrales[sensor].direccion, unidad: un }), retain: true };\n    return [msg, null, umbralMsg];\n}\nreturn [null, msg, null];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 150,
+        "y": 160,
+        "wires": [
+            [
+                "gemelo.consulta.output",
+                "gemelo.mqtt.respuesta"
+            ],
+            [
+                "gemelo.consulta.llm"
+            ],
+            [
+                "gemelo.mqtt.umbral"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.mqtt.umbral",
+        "type": "mqtt out",
+        "z": "gemelo.consulta.natural",
+        "name": "Publicar umbral (retenido)",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "broker": "367352e091ce6828",
+        "x": 470,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "gemelo.umbrales.in",
+        "type": "mqtt in",
+        "z": "gemelo.digital",
+        "name": "Umbrales (retenidos)",
+        "topic": "smarthome/equipo2/umbrales/#",
+        "qos": "1",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "inputs": 0,
+        "x": 130,
+        "y": 720,
+        "wires": [
+            [
+                "gemelo.umbrales.apply"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.umbrales.apply",
+        "type": "function",
+        "z": "gemelo.digital",
+        "name": "Aplicar umbral al gemelo",
+        "func": "var topic = msg.topic || \"\";\nvar sensor = topic.split(\"/\").pop();\nvar data = typeof msg.payload === \"string\" ? JSON.parse(msg.payload) : msg.payload;\nif (!data || data.limite === undefined) return null;\n\nvar persist = global.get(\"umbrales_persistidos\") || {};\npersist[sensor] = data.limite;\nglobal.set(\"umbrales_persistidos\", persist);\n\nvar gemelo = global.get(\"gemelo\");\nif (gemelo && gemelo.umbrales && gemelo.umbrales[sensor]) {\n    gemelo.umbrales[sensor].limite = data.limite;\n    global.set(\"gemelo\", gemelo);\n}\nnode.status({fill:\"grey\",shape:\"dot\",text:sensor + \"=\" + data.limite});\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 720,
+        "wires": [
+            []
         ]
     },
     {
@@ -534,7 +608,7 @@
         "type": "function",
         "z": "gemelo.consulta.natural",
         "name": "Construir consulta + contexto",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\";\ncontexto += \"- Buzzer: \" + (e.buzzer ? \"Activado\" : \"Apagado\") + \"\\n\\n\";\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\";\ncontexto += \"- Buzzer: \" + (e.buzzer ? \"Activado\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
