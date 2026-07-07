@@ -1,6 +1,7 @@
 #include <SPI.h>
 #include <WiFi101.h>
 #include <PubSubClient.h>
+#include <LiquidCrystal.h>
 
 // CONFIGURACION DE WI-FI Y MQTT
 const char* ssid = "iPhoneTintin";
@@ -19,6 +20,14 @@ PubSubClient client(mkrClient);
 const int pinMaxBotix = A0;
 const int pinMQ       = A1;
 const int pinMAX4466  = A2;
+
+// LCD JHD 162A en modo 4-bit: RS=5, E=6, D4=7, D5=8, D6=9, D7=10
+LiquidCrystal lcd(5, 6, 7, 8, 9, 10);
+
+// UMBRALES DE ALERTA (ajustar segun los mismos valores que usa Node-RED)
+const int    UMBRAL_CO2       = 400;  // valor ADC raw
+const int    UMBRAL_SONIDO    = 70;   // porcentaje
+const float  UMBRAL_DISTANCIA = 30.0; // cm
 
 // DEFINICION DE PINES Y ESTADO DEL LED
 const int pinLED = 4;
@@ -97,12 +106,41 @@ void reconnect() {
   }
 }
 
+void actualizarLCD(float dist, int co2, int sonido) {
+  // Fila 0: valores de sensores (rotados cada ciclo para caber en 16 chars)
+  lcd.setCursor(0, 0);
+  lcd.print("D:");
+  lcd.print((int)dist);
+  lcd.print("cm G:");
+  lcd.print(co2);
+  lcd.print("  ");   // limpia restos de ciclo anterior
+
+  // Fila 1: estado de alerta
+  lcd.setCursor(0, 1);
+  if (co2 > UMBRAL_CO2) {
+    lcd.print("! ALERTA: GAS   ");
+  } else if (sonido > UMBRAL_SONIDO) {
+    lcd.print("! ALERTA: SONIDO");
+  } else if (dist < UMBRAL_DISTANCIA) {
+    lcd.print("! ALERTA: DIST. ");
+  } else {
+    lcd.print("S:");
+    lcd.print(sonido);
+    lcd.print("%  OK          ");
+  }
+}
+
 void setup() {
   Serial.begin(9600);
   while (!Serial) { ; }
   Serial.println("Iniciando sistema IoT...");
   pinMode(pinLED, OUTPUT);
   digitalWrite(pinLED, LOW);
+
+  lcd.begin(16, 2);
+  lcd.setCursor(0, 0);
+  lcd.print("Iniciando...");
+
   setup_wifi();
   client.setServer(mqtt_server, mqtt_port);
   client.setBufferSize(512);
@@ -160,12 +198,22 @@ void loop() {
     Serial.print("\t| CO2 MQ7: "); Serial.print(valorCO2);
     Serial.print("\t| Sonido: "); Serial.println(porcentajeSonido);
 
+    // 4b. ACTUALIZAR LCD
+    actualizarLCD(distanciaCm, valorCO2, porcentajeSonido);
+
     // 5. PUBLICAR TOPICS
     client.publish(topicCO2,       String(valorCO2).c_str());
     client.publish(topicSonido,    String(porcentajeSonido).c_str());
     client.publish(topicDistancia, String(distanciaCm, 1).c_str());
 
-    // 6. JSON COMBINADO
+    // 6. JSON COMBINADO (alerta/tipo para Node-RED)
+    String tipoAlerta = "NINGUNA";
+    if (valorCO2 > UMBRAL_CO2)           tipoAlerta = "GAS";
+    else if (porcentajeSonido > UMBRAL_SONIDO) tipoAlerta = "SONIDO";
+    else if (distanciaCm < UMBRAL_DISTANCIA)   tipoAlerta = "DISTANCIA";
+    client.publish("smarthome/equipo2/alerta/tipo", tipoAlerta.c_str());
+
+    // 7. JSON COMBINADO
     String payload = "{";
     payload += "\"distancia\": " + String(distanciaCm) + ", ";
     payload += "\"co2\": " + String(valorCO2) + ", ";

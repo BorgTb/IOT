@@ -184,5 +184,69 @@
         "x": 550,
         "y": 400,
         "wires": []
+    },
+    {
+        "id": "telegram.consulta.in",
+        "type": "telegram receiver",
+        "z": "flow.alertas",
+        "name": "Mensaje libre",
+        "bot": "bot.telegram",
+        "x": 140,
+        "y": 520,
+        "wires": [["func.consulta.prompt"]]
+    },
+    {
+        "id": "func.consulta.prompt",
+        "type": "function",
+        "z": "flow.alertas",
+        "name": "Construir consulta + contexto",
+        "func": "const texto = String((msg.payload && msg.payload.content) || '').trim();\nconst chatId = msg.payload && msg.payload.chatId;\nif (!texto || texto.startsWith('/')) return [null, null];\n\nconst gemelo = global.get('gemelo');\nif (!gemelo) {\n    return [null, { payload: { chatId: chatId, type: 'message', content: '⏳ El gemelo digital aún no está inicializado, probá de nuevo en unos segundos.' } }];\n}\n\nconst e = gemelo.estado_actual;\nconst u = gemelo.umbrales;\n\nlet contexto = 'Datos actuales de los sensores de la casa:\\n';\ncontexto += '- CO2 (sensor MQ7): ' + e.co2 + ' ppm\\n';\ncontexto += '- Distancia (ultrasonico): ' + e.distancia + ' cm\\n';\ncontexto += '- Nivel de sonido: ' + e.sonido + ' dB\\n';\ncontexto += '- Persona detectada por la camara: ' + (e.persona ? ('Si' + (e.persona_nombre ? ', identificada como ' + e.persona_nombre : ', desconocida')) : 'No') + '\\n';\ncontexto += '- LED: ' + (e.led ? 'Encendido' : 'Apagado') + '\\n';\ncontexto += '- Buzzer: ' + (e.buzzer ? 'Activado' : 'Apagado') + '\\n\\n';\nif (u) {\n    contexto += 'Umbrales criticos configurados (se considera peligroso al superarlos):\\n';\n    contexto += '- CO2: mayor a ' + u.co2.limite + ' ppm\\n';\n    contexto += '- Sonido: mayor a ' + u.sonido.limite + ' dB\\n';\n    contexto += '- Distancia: menor a ' + u.distancia.limite + ' cm\\n\\n';\n}\ncontexto += 'Pregunta del usuario: ' + texto;\n\nmsg.chatId = chatId;\nmsg.payload = {\n    model: 'llama3.2:3b',\n    system: 'Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.',\n    prompt: contexto,\n    stream: false\n};\nreturn [msg, null];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 380,
+        "y": 520,
+        "wires": [["http.consulta.llm"], ["telegram.consulta.out"]]
+    },
+    {
+        "id": "http.consulta.llm",
+        "type": "http request",
+        "z": "flow.alertas",
+        "name": "POST Ollama",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "body",
+        "url": "http://ollama:11434/api/generate",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "headers": [],
+        "x": 610,
+        "y": 520,
+        "wires": [["func.consulta.respuesta"]]
+    },
+    {
+        "id": "func.consulta.respuesta",
+        "type": "function",
+        "z": "flow.alertas",
+        "name": "Formatear respuesta",
+        "func": "const respuesta = (msg.payload && msg.payload.response) || 'No se pudo obtener respuesta del asistente.';\nmsg.payload = { chatId: msg.chatId, type: 'message', content: respuesta };\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 830,
+        "y": 520,
+        "wires": [["telegram.consulta.out"]]
+    },
+    {
+        "id": "telegram.consulta.out",
+        "type": "telegram sender",
+        "z": "flow.alertas",
+        "name": "Responder Telegram",
+        "bot": "bot.telegram",
+        "chatId": "",
+        "x": 1050,
+        "y": 520,
+        "wires": []
     }
 ]
