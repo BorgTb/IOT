@@ -211,6 +211,26 @@
         "verboselogging": false
     },
     {
+        "id": "seguridad.ui.tab",
+        "type": "ui_tab",
+        "name": "Seguridad",
+        "icon": "security",
+        "order": 2,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "seguridad.ui.group",
+        "type": "ui_group",
+        "name": "Ultima Persona Detectada",
+        "tab": "seguridad.ui.tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
         "id": "gemelo.init",
         "type": "inject",
         "z": "gemelo.digital",
@@ -353,7 +373,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Construir Prompt LLM",
-        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
+        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nvar up = global.get('ultima_persona');\nif (up) prompt += \"- Ultima persona detectada: \" + up.nombre + \" (\" + (up.reconocida ? \"conocida\" : \"DESCONOCIDA\") + \") a las \" + up.hora + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -814,7 +834,7 @@
         "type": "function",
         "z": "gemelo.consulta.natural",
         "name": "Construir consulta + contexto",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\nvar up = global.get('ultima_persona');\nif (up) contexto += \"- Ultima persona detectada: \" + up.nombre + \" (\" + (up.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + up.hora + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1024,7 +1044,8 @@
         "y": 380,
         "wires": [
             [
-                "cam.debug"
+                "cam.debug",
+                "cam.ultima"
             ]
         ]
     },
@@ -1041,6 +1062,184 @@
         "x": 510,
         "y": 380,
         "wires": []
+    },
+    {
+        "id": "seguridad.ui.nombre",
+        "type": "ui_text",
+        "z": "coap.tab",
+        "group": "seguridad.ui.group",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "name": "Nombre:",
+        "label": "Nombre:",
+        "format": "{{msg.payload.nombre}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 720,
+        "y": 740,
+        "wires": []
+    },
+    {
+        "id": "seguridad.ui.estado",
+        "type": "ui_text",
+        "z": "coap.tab",
+        "group": "seguridad.ui.group",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Estado:",
+        "label": "Estado:",
+        "format": "{{msg.payload.estado}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 740,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "seguridad.ui.hora",
+        "type": "ui_text",
+        "z": "coap.tab",
+        "group": "seguridad.ui.group",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "name": "Hora:",
+        "label": "Hora:",
+        "format": "{{msg.payload.hora}}",
+        "layout": "row-spread",
+        "className": "",
+        "x": 830,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "cam.ultima",
+        "type": "function",
+        "z": "coap.tab",
+        "name": "Guardar ultima persona",
+        "func": "// Solo actualizar cuando la camara detecto a alguien\nif (!msg.payload || !msg.payload.persona) return null;\n\nvar reconocida = !!msg.payload.reconocida;\nvar rec = {\n    nombre: reconocida ? msg.payload.nombre : 'Desconocida',\n    reconocida: reconocida,\n    estado: reconocida ? 'Conocida' : 'DESCONOCIDA',\n    timestamp: new Date().toISOString(),\n    hora: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })\n};\n\nglobal.set('ultima_persona', rec);\nvar gemelo = global.get('gemelo');\nif (gemelo) {\n    gemelo.ultima_persona = rec;\n    global.set('gemelo', gemelo);\n}\n\nnode.status({ fill: reconocida ? 'green' : 'red', shape: 'dot', text: rec.nombre + ' (' + rec.estado + ')' });\nmsg.payload = rec;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 460,
+        "wires": [
+            [
+                "seguridad.ui.nombre",
+                "seguridad.ui.estado",
+                "seguridad.ui.hora",
+                "cam.ultima.tostr"
+            ]
+        ]
+    },
+    {
+        "id": "cam.ultima.tostr",
+        "type": "function",
+        "z": "coap.tab",
+        "name": "A JSON",
+        "func": "msg.payload = JSON.stringify(msg.payload, null, 2);\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 460,
+        "wires": [
+            [
+                "cam.ultima.file"
+            ]
+        ]
+    },
+    {
+        "id": "cam.ultima.file",
+        "type": "file",
+        "z": "coap.tab",
+        "name": "ultima_persona.json",
+        "filename": "/data/ultima_persona.json",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "utf8",
+        "x": 770,
+        "y": 460,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cam.restore.inject",
+        "type": "inject",
+        "z": "coap.tab",
+        "name": "Al iniciar",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "cam.restore.file"
+            ]
+        ]
+    },
+    {
+        "id": "cam.restore.file",
+        "type": "file in",
+        "z": "coap.tab",
+        "name": "Leer ultima_persona.json",
+        "filename": "/data/ultima_persona.json",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "utf8",
+        "allProps": false,
+        "x": 330,
+        "y": 540,
+        "wires": [
+            [
+                "cam.restore.parse"
+            ]
+        ]
+    },
+    {
+        "id": "cam.restore.parse",
+        "type": "function",
+        "z": "coap.tab",
+        "name": "Restaurar en contexto",
+        "func": "try {\n    var rec = JSON.parse(msg.payload);\n    if (!rec || !rec.nombre) return null;\n    global.set('ultima_persona', rec);\n    var gemelo = global.get('gemelo');\n    if (gemelo) { gemelo.ultima_persona = rec; global.set('gemelo', gemelo); }\n    msg.payload = rec;\n    return msg;\n} catch (e) { return null; }",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 540,
+        "wires": [
+            [
+                "seguridad.ui.nombre",
+                "seguridad.ui.estado",
+                "seguridad.ui.hora"
+            ]
+        ]
     },
     {
         "id": "6314799547cb00e2",

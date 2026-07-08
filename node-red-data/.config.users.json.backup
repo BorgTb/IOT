@@ -14,7 +14,7 @@
                 "view-show-welcome-tours": true
             },
             "tours": {
-                "welcome": "4.1.10"
+                "welcome": "5.0.1"
             },
             "dialog": {
                 "export": {
@@ -24,7 +24,7 @@
             }
         },
         "debug": {
-            "filter": "filterSelected",
+            "filter": "filterAll",
             "filteredNodes": [
                 "b92fd24676f0c14b",
                 "1e2a85f3a05f3c9f",

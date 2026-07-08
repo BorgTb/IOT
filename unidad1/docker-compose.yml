@@ -1,0 +1,67 @@
+services:
+  # Servicio de MQTT Broker
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    ports:
+      - "1883:1883"        # Puerto MQTT estándar
+      - "9001:9001"        # Puerto para WebSockets (opcional)
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+  # Servicio de Node-RED (Personalizado)
+  nodered:  
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodered
+    environment:
+      - TZ=America/Santiago  
+      - NODE_OPTIONS=--dns-result-order=ipv4first
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=1
+      - net.ipv6.conf.default.disable_ipv6=1
+    ports:
+      - "1880:1880"        # Interfaz web de Node-RED
+    volumes:
+      - ./node-red-data:/data
+    depends_on:
+      - mosquitto
+    networks:
+      - red_iot
+    restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  # NUEVO: Servicio de IA (Reconocimiento Facial)
+  api-ia:
+    build:
+      context: ./api-ia
+      dockerfile: Dockerfile
+    container_name: api-ia
+    environment:
+      - TZ=America/Santiago
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./api-ia/imagenes_db:/app/imagenes_db
+      - ./api-ia/data:/app/data
+    networks:
+      - red_iot
+    restart: unless-stopped
+
+# --- CONFIGURACIÓN DE RED PARA REPARAR EL HOTSPOT ---
+networks:
+  red_iot:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: 1350
+    ipam:
+      config:
+        - subnet: 10.5.0.0/16
