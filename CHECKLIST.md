@@ -43,7 +43,7 @@
 - [x] ✅ Node-RED construye el prompt con el estado real del hogar
 - [x] ✅ `POST /api/generate` con `"format":"json"`
 - [x] ✅ Parsea la respuesta y publica comandos MQTT
-- [x] ✅ **Comandos LED/buzzer/decisión ahora van a `smarthome/equipo2/...`** (corregido el desajuste equipo1/equipo2) → llegan al dispositivo real (MKR1000)
+- [x] ✅ **Comandos LED/decisión ahora van a `smarthome/equipo2/...`** (corregido el desajuste equipo1/equipo2) → llegan al dispositivo real (MKR1000)
 
 ## 5.4 Consulta en lenguaje natural
 - [x] ✅ Campo de texto en el dashboard (`/ui`)

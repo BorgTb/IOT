@@ -30,7 +30,7 @@ contenedores con Docker Compose.
         │                    ┌──────────┐
         │                    │ Grafana  │ (dashboards + alerta)
         │                    └──────────┘
-        │ control (led/buzzer)
+        │ control (led)
         │                    ┌──────────┐  razona+actúa cada 2 min
         └────────────────────│   n8n    │ (agente autónomo)
                              │  Agente  │──▶ Ollama / Node-RED / InfluxDB

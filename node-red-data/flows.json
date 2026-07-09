@@ -18,7 +18,7 @@
         "disabled": false
     },
     {
-        "id": "flow.alertas",
+        "id": "fb521be7f51074da",
         "type": "tab",
         "label": "Alertas + Control LED",
         "disabled": false
@@ -35,29 +35,6 @@
         "caname": "",
         "servername": "mosquitto",
         "verifyservercert": false
-    },
-    {
-        "id": "367352e091ce6828",
-        "type": "mqtt-broker",
-        "name": "MQTT Seguro",
-        "broker": "mosquitto",
-        "port": "8883",
-        "tls": "gemelo.tls.config",
-        "clientid": "nodered_llm",
-        "autoConnect": true,
-        "usetls": true,
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
     },
     {
         "id": "gemelo.ui.tab",
@@ -174,6 +151,29 @@
         }
     },
     {
+        "id": "367352e091ce6828",
+        "type": "mqtt-broker",
+        "name": "MQTT Seguro",
+        "broker": "mosquitto",
+        "port": "8883",
+        "tls": "gemelo.tls.config",
+        "clientid": "nodered_llm",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
         "id": "broker.local",
         "type": "mqtt-broker",
         "name": "Broker local",
@@ -278,7 +278,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Crear Gemelo Digital",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (gemelo && gemelo.estado_actual) { node.status({fill:\"green\",shape:\"dot\",text:\"Gemelo ya activo\"}); return null; }\ngemelo = {\n    \"ultimo_update\": new Date().toISOString(),\n    \"estado_actual\": {\n        \"co2\": 200,\n        \"distancia\": 100,\n        \"sonido\": 30,\n        \"persona\": false,\n        \"persona_reconocida\": false,\n        \"persona_nombre\": null,\n        \"led\": false,\n        \"buzzer\": false\n    },\n    \"umbrales\": {\n        \"co2\": { \"limite\": 400, \"direccion\": \"mayor\", \"unidad\": \"ppm\" },\n        \"sonido\": { \"limite\": 80, \"direccion\": \"mayor\", \"unidad\": \"dB\" },\n        \"distancia\": { \"limite\": 20, \"direccion\": \"menor\", \"unidad\": \"cm\" }\n    },\n    \"historial_1h\": [],\n    \"alertas_activas\": [],\n    \"prediccion_30min\": {\n        \"co2\": null,\n        \"distancia\": null\n    },\n    \"resumen_llm\": \"Sistema iniciado\"\n};\nvar persist = global.get(\"umbrales_persistidos\");\nif (persist) { for (var s in persist) { if (gemelo.umbrales[s]) gemelo.umbrales[s].limite = persist[s]; } }\nglobal.set(\"gemelo\", gemelo);\nnode.status({fill:\"green\",shape:\"dot\",text:\"Gemelo activo\"});\nreturn null;",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (gemelo && gemelo.estado_actual) { node.status({fill:\"green\",shape:\"dot\",text:\"Gemelo ya activo\"}); return null; }\ngemelo = {\n    \"ultimo_update\": new Date().toISOString(),\n    \"estado_actual\": {\n        \"co2\": 200,\n        \"distancia\": 100,\n        \"sonido\": 30,\n        \"persona\": false,\n        \"persona_reconocida\": false,\n        \"persona_nombre\": null,\n        \"led\": false\n    },\n    \"umbrales\": {\n        \"co2\": { \"limite\": 400, \"direccion\": \"mayor\", \"unidad\": \"ppm\" },\n        \"sonido\": { \"limite\": 80, \"direccion\": \"mayor\", \"unidad\": \"dB\" },\n        \"distancia\": { \"limite\": 20, \"direccion\": \"menor\", \"unidad\": \"cm\" }\n    },\n    \"historial_1h\": [],\n    \"alertas_activas\": [],\n    \"prediccion_30min\": {\n        \"co2\": null,\n        \"distancia\": null\n    },\n    \"resumen_llm\": \"Sistema iniciado\"\n};\nvar persist = global.get(\"umbrales_persistidos\");\nif (persist) { for (var s in persist) { if (gemelo.umbrales[s]) gemelo.umbrales[s].limite = persist[s]; } }\nglobal.set(\"gemelo\", gemelo);\nnode.status({fill:\"green\",shape:\"dot\",text:\"Gemelo activo\"});\nreturn null;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -353,7 +353,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Construir Prompt LLM",
-        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    activar_buzzer: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
+        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -395,8 +395,8 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Procesar Respuesta LLM",
-        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.response) return null;\n\ntry {\n    var decision = JSON.parse(payload.response);\n    \n    msg1 = { payload: {} };\n    msg2 = { payload: {} };\n    msg3 = { payload: {} };\n    \n    if (decision.activar_led) {\n        msg1.payload = { estado: decision.activar_led };\n    }\n    if (decision.activar_buzzer) {\n        msg2.payload = { estado: decision.activar_buzzer };\n    }\n    \n    msg3.payload = {\n        nivel: decision.nivel_alerta || \"normal\",\n        razonamiento: decision.razonamiento || \"\",\n        timestamp: new Date().toISOString()\n    };\n    \n    gemelo.resumen_llm = decision.razonamiento || \"\";\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    \n    node.status({fill:\"blue\",shape:\"dot\",text:decision.nivel_alerta});\n    \n    return [[msg1], [msg2], [msg3]];\n} catch(e) {\n    node.error(\"Error parseando respuesta LLM: \" + e);\n    return null;\n}",
-        "outputs": 3,
+        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.response) return null;\n\ntry {\n    var decision = JSON.parse(payload.response);\n    \n    msg1 = { payload: {} };\n    msg3 = { payload: {} };\n    \n    if (decision.activar_led) {\n        msg1.payload = { estado: decision.activar_led };\n    }\n    \n    msg3.payload = {\n        nivel: decision.nivel_alerta || \"normal\",\n        razonamiento: decision.razonamiento || \"\",\n        timestamp: new Date().toISOString()\n    };\n    \n    gemelo.resumen_llm = decision.razonamiento || \"\";\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    \n    node.status({fill:\"blue\",shape:\"dot\",text:decision.nivel_alerta});\n    \n    return [[msg1], [msg3]];\n} catch(e) {\n    node.error(\"Error parseando respuesta LLM: \" + e);\n    return null;\n}",
+        "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -406,9 +406,6 @@
         "wires": [
             [
                 "gemelo.mqtt.led"
-            ],
-            [
-                "gemelo.mqtt.buzzer"
             ],
             [
                 "gemelo.mqtt.decision"
@@ -426,19 +423,6 @@
         "broker": "367352e091ce6828",
         "x": 1230,
         "y": 120,
-        "wires": []
-    },
-    {
-        "id": "gemelo.mqtt.buzzer",
-        "type": "mqtt out",
-        "z": "gemelo.digital",
-        "name": "Control Buzzer",
-        "topic": "smarthome/equipo2/control/buzzer",
-        "qos": "1",
-        "retain": "",
-        "broker": "367352e091ce6828",
-        "x": 1230,
-        "y": 160,
         "wires": []
     },
     {
@@ -830,7 +814,7 @@
         "type": "function",
         "z": "gemelo.consulta.natural",
         "name": "Construir consulta + contexto",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\";\ncontexto += \"- Buzzer: \" + (e.buzzer ? \"Activado\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -1059,27 +1043,27 @@
         "wires": []
     },
     {
-        "id": "mqtt.in",
+        "id": "6314799547cb00e2",
         "type": "mqtt in",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Sensores MKR1000",
         "topic": "smarthome/equipo2/alerta",
         "qos": "2",
         "datatype": "utf8",
-        "broker": "broker.local",
+        "broker": "367352e091ce6828",
         "inputs": 0,
         "x": 140,
         "y": 120,
         "wires": [
             [
-                "json.parse"
+                "46e07d62e61c1554"
             ]
         ]
     },
     {
-        "id": "json.parse",
+        "id": "46e07d62e61c1554",
         "type": "json",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Parsear JSON",
         "property": "payload",
         "action": "obj",
@@ -1088,33 +1072,32 @@
         "y": 120,
         "wires": [
             [
-                "func.umbrales"
+                "46d0b9e4a57cb01f"
             ]
         ]
     },
     {
-        "id": "func.umbrales",
+        "id": "46d0b9e4a57cb01f",
         "type": "function",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Verificar umbrales",
-        "func": "const d = msg.payload;\nconst cooldown = 60000;\nconst now = Date.now();\nlet alerts = [];\n\nif (d.distancia < 20) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm');\n        context.set('d_alert', now);\n    }\n}\nif (d.gas > 500) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de gas elevado!*\\nValor: ' + d.gas);\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > 80) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '%');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
+        "func": "const d = msg.payload;\nconst cooldown = 60000;\nconst now = Date.now();\nlet alerts = [];\n\nconst gemelo = global.get('gemelo');\nconst u = (gemelo && gemelo.umbrales) || {\n    co2: { limite: 400 },\n    sonido: { limite: 80 },\n    distancia: { limite: 20 }\n};\n\nif (d.distancia < u.distancia.limite) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm (límite: ' + u.distancia.limite + ' cm)');\n        context.set('d_alert', now);\n    }\n}\nif (d.co2 > u.co2.limite) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de CO2 elevado!*\\nValor: ' + d.co2 + ' ppm (límite: ' + u.co2.limite + ' ppm)');\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > u.sonido.limite) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '% (límite: ' + u.sonido.limite + '%)');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
         "outputs": 1,
         "noerr": 0,
         "x": 510,
         "y": 120,
         "wires": [
             [
-                "telegram.out"
+                "8adf24978d9ceaea"
             ]
         ]
     },
     {
-        "id": "telegram.out",
+        "id": "8adf24978d9ceaea",
         "type": "telegram sender",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Enviar alerta",
         "bot": "bot.telegram",
-        "haserroroutput": false,
         "outputs": 1,
         "x": 710,
         "y": 120,
@@ -1123,9 +1106,9 @@
         ]
     },
     {
-        "id": "cmd.led",
+        "id": "87f8c3c6a94a062b",
         "type": "telegram command",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Comando /led",
         "command": "/led",
         "bot": "bot.telegram",
@@ -1137,15 +1120,15 @@
         "y": 280,
         "wires": [
             [
-                "func.led.cmd"
+                "032cfb6d6ad98096"
             ],
             []
         ]
     },
     {
-        "id": "func.led.cmd",
+        "id": "032cfb6d6ad98096",
         "type": "function",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Mapear comando LED",
         "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, {\n        payload: { chatId: chatId, type: 'message', content: '❌ Usá: /led ON, /led OFF o /led TOGGLE' }\n    }];\n}\n\nreturn [\n    { payload: accion },                                        // Output 1 → MQTT\n    { payload: { chatId: chatId, type: 'message', content: '✅ LED ' + accion } }  // Output 2 → Telegram\n];",
         "outputs": 2,
@@ -1154,30 +1137,30 @@
         "y": 280,
         "wires": [
             [
-                "mqtt.led.out"
+                "ddebb9f1ba728a32"
             ],
             [
-                "telegram.led.confirm"
+                "7bab4ab11061160f"
             ]
         ]
     },
     {
-        "id": "mqtt.led.out",
+        "id": "ddebb9f1ba728a32",
         "type": "mqtt out",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Publicar comando",
         "topic": "smarthome/equipo2/control/led",
         "qos": "1",
         "retain": false,
-        "broker": "broker.local",
+        "broker": "367352e091ce6828",
         "x": 570,
         "y": 260,
         "wires": []
     },
     {
-        "id": "telegram.led.confirm",
+        "id": "7bab4ab11061160f",
         "type": "telegram sender",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Confirmar comando",
         "bot": "bot.telegram",
         "outputs": 1,
@@ -1188,27 +1171,27 @@
         ]
     },
     {
-        "id": "mqtt.led.state.in",
+        "id": "def0fad6f92c2dc0",
         "type": "mqtt in",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Estado del LED",
         "topic": "smarthome/equipo2/led/state",
         "qos": "2",
         "datatype": "auto-detect",
-        "broker": "broker.local",
+        "broker": "367352e091ce6828",
         "inputs": 0,
         "x": 140,
         "y": 400,
         "wires": [
             [
-                "func.led.notify"
+                "268ba9491b619f98"
             ]
         ]
     },
     {
-        "id": "func.led.notify",
+        "id": "268ba9491b619f98",
         "type": "function",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Notificar estado LED",
         "func": "const estado = String(msg.payload).toUpperCase();\nconst icono = estado === 'ON' ? '🟢' : '🔴';\nmsg.payload = {\n    chatId: '1138232122',\n    type: 'message',\n    content: icono + ' LED ' + (estado === 'ON' ? 'ENCENDIDO' : 'APAGADO')\n};\nreturn msg;",
         "outputs": 1,
@@ -1217,106 +1200,19 @@
         "y": 400,
         "wires": [
             [
-                "telegram.led.notify"
+                "28d777557f85eca3"
             ]
         ]
     },
     {
-        "id": "telegram.led.notify",
+        "id": "28d777557f85eca3",
         "type": "telegram sender",
-        "z": "flow.alertas",
+        "z": "fb521be7f51074da",
         "name": "Notificar Telegram",
         "bot": "bot.telegram",
         "outputs": 1,
         "x": 550,
         "y": 400,
-        "wires": [
-            []
-        ]
-    },
-    {
-        "id": "telegram.consulta.in",
-        "type": "telegram receiver",
-        "z": "flow.alertas",
-        "name": "Mensaje libre",
-        "bot": "bot.telegram",
-        "inputs": 0,
-        "x": 140,
-        "y": 520,
-        "wires": [
-            [
-                "func.consulta.prompt"
-            ],
-            []
-        ]
-    },
-    {
-        "id": "func.consulta.prompt",
-        "type": "function",
-        "z": "flow.alertas",
-        "name": "Construir consulta + contexto",
-        "func": "const texto = String((msg.payload && msg.payload.content) || '').trim();\nconst chatId = msg.payload && msg.payload.chatId;\nif (!texto || texto.startsWith('/')) return [null, null];\n\nconst gemelo = global.get('gemelo');\nif (!gemelo) {\n    return [null, { payload: { chatId: chatId, type: 'message', content: '⏳ El gemelo digital aún no está inicializado, probá de nuevo en unos segundos.' } }];\n}\n\nconst e = gemelo.estado_actual;\nconst u = gemelo.umbrales;\n\nlet contexto = 'Datos actuales de los sensores de la casa:\\n';\ncontexto += '- CO2 (sensor MQ7): ' + e.co2 + ' ppm\\n';\ncontexto += '- Distancia (ultrasonico): ' + e.distancia + ' cm\\n';\ncontexto += '- Nivel de sonido: ' + e.sonido + ' dB\\n';\ncontexto += '- Persona detectada por la camara: ' + (e.persona ? ('Si' + (e.persona_nombre ? ', identificada como ' + e.persona_nombre : ', desconocida')) : 'No') + '\\n';\ncontexto += '- LED: ' + (e.led ? 'Encendido' : 'Apagado') + '\\n';\ncontexto += '- Buzzer: ' + (e.buzzer ? 'Activado' : 'Apagado') + '\\n\\n';\nif (u) {\n    contexto += 'Umbrales criticos configurados (se considera peligroso al superarlos):\\n';\n    contexto += '- CO2: mayor a ' + u.co2.limite + ' ppm\\n';\n    contexto += '- Sonido: mayor a ' + u.sonido.limite + ' dB\\n';\n    contexto += '- Distancia: menor a ' + u.distancia.limite + ' cm\\n\\n';\n}\ncontexto += 'Pregunta del usuario: ' + texto;\n\nmsg.chatId = chatId;\nmsg.payload = {\n    model: 'llama3.2:3b',\n    system: 'Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.',\n    prompt: contexto,\n    stream: false\n};\nreturn [msg, null];",
-        "outputs": 2,
-        "noerr": 0,
-        "x": 380,
-        "y": 520,
-        "wires": [
-            [
-                "http.consulta.llm"
-            ],
-            [
-                "telegram.consulta.out"
-            ]
-        ]
-    },
-    {
-        "id": "http.consulta.llm",
-        "type": "http request",
-        "z": "flow.alertas",
-        "name": "POST Ollama",
-        "method": "POST",
-        "ret": "obj",
-        "paytoqs": "body",
-        "url": "http://ollama:11434/api/generate",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "headers": [],
-        "x": 610,
-        "y": 520,
-        "wires": [
-            [
-                "func.consulta.respuesta"
-            ]
-        ]
-    },
-    {
-        "id": "func.consulta.respuesta",
-        "type": "function",
-        "z": "flow.alertas",
-        "name": "Formatear respuesta",
-        "func": "const respuesta = (msg.payload && msg.payload.response) || 'No se pudo obtener respuesta del asistente.';\nmsg.payload = { chatId: msg.chatId, type: 'message', content: respuesta };\nreturn msg;",
-        "outputs": 1,
-        "noerr": 0,
-        "x": 830,
-        "y": 520,
-        "wires": [
-            [
-                "telegram.consulta.out"
-            ]
-        ]
-    },
-    {
-        "id": "telegram.consulta.out",
-        "type": "telegram sender",
-        "z": "flow.alertas",
-        "name": "Responder Telegram",
-        "bot": "bot.telegram",
-        "outputs": 1,
-        "x": 1050,
-        "y": 520,
         "wires": [
             []
         ]
