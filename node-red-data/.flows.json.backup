@@ -24,6 +24,15 @@
     "disabled": false
   },
   {
+<<<<<<< HEAD
+    "id": "telegram.llm.ask",
+    "type": "tab",
+    "label": "Telegram LLM",
+    "disabled": false
+  },
+  {
+=======
+>>>>>>> main
     "id": "gemelo.tls.config",
     "type": "tls-config",
     "name": "TLS Mosquitto",
@@ -211,6 +220,40 @@
     "verboselogging": false
   },
   {
+<<<<<<< HEAD
+    "id": "seguridad.ui.tab",
+    "type": "ui_tab",
+    "name": "Seguridad",
+    "icon": "security",
+    "order": 2,
+    "disabled": false,
+    "hidden": false
+  },
+  {
+    "id": "seguridad.ui.group",
+    "type": "ui_group",
+    "name": "Ultima Persona Detectada",
+    "tab": "seguridad.ui.tab",
+    "order": 1,
+    "disp": true,
+    "width": "6",
+    "collapse": false,
+    "className": ""
+  },
+  {
+    "id": "reg.ui.group",
+    "type": "ui_group",
+    "name": "Registrar Persona",
+    "tab": "seguridad.ui.tab",
+    "order": 2,
+    "disp": true,
+    "width": "6",
+    "collapse": false,
+    "className": ""
+  },
+  {
+=======
+>>>>>>> main
     "id": "gemelo.init",
     "type": "inject",
     "z": "gemelo.digital",
@@ -814,7 +857,11 @@
     "type": "function",
     "z": "gemelo.consulta.natural",
     "name": "Construir consulta + contexto",
+<<<<<<< HEAD
+    "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"phi3:mini\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+=======
     "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+>>>>>>> main
     "outputs": 1,
     "noerr": 0,
     "initialize": "",
@@ -849,7 +896,13 @@
       [
         "gemelo.consulta.response"
       ]
+<<<<<<< HEAD
+    ],
+    "timeout": 120000,
+    "retry": "none"
+=======
     ]
+>>>>>>> main
   },
   {
     "id": "gemelo.consulta.response",
@@ -904,21 +957,34 @@
     "id": "cam.tick",
     "type": "inject",
     "z": "coap.tab",
+<<<<<<< HEAD
+    "name": "Cada 3s",
+=======
     "name": "Cada 20s",
+>>>>>>> main
     "props": [
       {
         "p": "payload"
       }
     ],
+<<<<<<< HEAD
+    "repeat": "3",
+=======
     "repeat": "20",
+>>>>>>> main
     "crontab": "",
     "once": false,
     "onceDelay": 5,
     "topic": "",
     "payload": "",
     "payloadType": "date",
+<<<<<<< HEAD
+    "x": 140,
+    "y": 100,
+=======
     "x": 130,
     "y": 320,
+>>>>>>> main
     "wires": [
       [
         "cam.url"
@@ -930,14 +996,23 @@
     "type": "function",
     "z": "coap.tab",
     "name": "URL camara",
+<<<<<<< HEAD
+    "func": "msg.url = env.get('CAMARA_URL') || 'http://172.20.10.8/capture';\n// Timeout corto: si la camara no responde, descartar y esperar el proximo tick\nmsg.requestTimeout = 4000;\nreturn msg;",
+=======
     "func": "msg.url = env.get('CAMARA_URL') || 'http://172.20.10.8/capture';\nreturn msg;",
+>>>>>>> main
     "outputs": 1,
     "noerr": 0,
     "initialize": "",
     "finalize": "",
     "libs": [],
+<<<<<<< HEAD
+    "x": 310,
+    "y": 100,
+=======
     "x": 300,
     "y": 320,
+>>>>>>> main
     "wires": [
       [
         "cam.get"
@@ -958,9 +1033,16 @@
     "proxy": "",
     "insecureHTTPParser": false,
     "authType": "",
+<<<<<<< HEAD
+    "senderr": false,
+    "headers": [],
+    "x": 510,
+    "y": 100,
+=======
     "headers": [],
     "x": 500,
     "y": 320,
+>>>>>>> main
     "wires": [
       [
         "cam.tob64"
@@ -972,14 +1054,23 @@
     "type": "function",
     "z": "coap.tab",
     "name": "JPEG -> base64",
+<<<<<<< HEAD
+    "func": "if (!Buffer.isBuffer(msg.payload) || msg.payload.length < 100) {\n    node.status({fill:'red',shape:'ring',text:'camara no disponible'});\n    return null;\n}\nvar b64 = msg.payload.toString('base64');\nmsg.payload = { image: 'data:image/jpeg;base64,' + b64 };\n// Conservar la foto para poder guardarla despues desde el dashboard\nmsg.imagen_b64 = msg.payload.image;\nmsg.headers = { 'Content-Type': 'application/json' };\n// Limpiar msg.url de la camara: el nodo /recognize tiene su propia URL\n// y msg.url ya no puede pisar la configurada (warning de Node-RED)\ndelete msg.url;\n// Timeout para que las peticiones a la API no se apilen si va lenta\nmsg.requestTimeout = 8000;\nreturn msg;",
+=======
     "func": "if (!Buffer.isBuffer(msg.payload) || msg.payload.length < 100) {\n    node.status({fill:'red',shape:'ring',text:'camara no disponible'});\n    return null;\n}\nvar b64 = msg.payload.toString('base64');\nmsg.payload = { image: 'data:image/jpeg;base64,' + b64 };\nmsg.headers = { 'Content-Type': 'application/json' };\nreturn msg;",
+>>>>>>> main
     "outputs": 1,
     "noerr": 0,
     "initialize": "",
     "finalize": "",
     "libs": [],
+<<<<<<< HEAD
+    "x": 700,
+    "y": 100,
+=======
     "x": 690,
     "y": 320,
+>>>>>>> main
     "wires": [
       [
         "cam.recognize"
@@ -1001,8 +1092,13 @@
     "insecureHTTPParser": false,
     "authType": "",
     "headers": [],
+<<<<<<< HEAD
+    "x": 920,
+    "y": 100,
+=======
     "x": 910,
     "y": 320,
+>>>>>>> main
     "wires": [
       [
         "cam.persona"
@@ -1014,17 +1110,31 @@
     "type": "function",
     "z": "coap.tab",
     "name": "Actualizar persona en gemelo",
+<<<<<<< HEAD
+    "func": "var r = msg.payload || {};\nvar total = r.total_detectados || (r.rostros ? r.rostros.length : 0);\nvar reconocido = false;\nvar nombre = null;\nif (r.rostros && r.rostros.length) {\n    var rec = r.rostros.find(function(x){ return x.reconocido; });\n    if (rec) { reconocido = true; nombre = rec.nombre; }\n}\nvar gemelo = global.get('gemelo');\nif (gemelo) {\n    gemelo.estado_actual.persona = total > 0;\n    gemelo.estado_actual.persona_reconocida = reconocido;\n    gemelo.estado_actual.persona_nombre = nombre;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set('gemelo', gemelo);\n}\n// Almacenar temporalmente la foto del ultimo rostro detectado\n// para que pueda registrarse despues desde el dashboard\nif (total > 0 && msg.imagen_b64) {\n    global.set('ultima_captura', {\n        image: msg.imagen_b64,\n        nombre: nombre,\n        reconocida: reconocido,\n        timestamp: new Date().toISOString(),\n        hora: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })\n    });\n}\nnode.status({fill: total>0?'blue':'grey', shape:'dot', text: total>0 ? ('persona: '+(nombre||'desconocida')) : 'sin persona'});\nmsg.payload = { persona: total>0, reconocida: reconocido, nombre: nombre };\nreturn msg;",
+=======
     "func": "var r = msg.payload || {};\nvar total = r.total_detectados || (r.rostros ? r.rostros.length : 0);\nvar reconocido = false;\nvar nombre = null;\nif (r.rostros && r.rostros.length) {\n    var rec = r.rostros.find(function(x){ return x.reconocido; });\n    if (rec) { reconocido = true; nombre = rec.nombre; }\n}\nvar gemelo = global.get('gemelo');\nif (gemelo) {\n    gemelo.estado_actual.persona = total > 0;\n    gemelo.estado_actual.persona_reconocida = reconocido;\n    gemelo.estado_actual.persona_nombre = nombre;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set('gemelo', gemelo);\n}\nnode.status({fill: total>0?'blue':'grey', shape:'dot', text: total>0 ? ('persona: '+(nombre||'desconocida')) : 'sin persona'});\nreturn { payload: { persona: total>0, reconocida: reconocido, nombre: nombre } };",
+>>>>>>> main
     "outputs": 1,
     "noerr": 0,
     "initialize": "",
     "finalize": "",
     "libs": [],
+<<<<<<< HEAD
+    "x": 310,
+    "y": 160,
+    "wires": [
+      [
+        "cam.debug",
+        "cam.ultima",
+        "cam.foto.ui"
+=======
     "x": 300,
     "y": 380,
     "wires": [
       [
         "cam.debug"
+>>>>>>> main
       ]
     ]
   },
@@ -1038,8 +1148,390 @@
     "console": false,
     "tostatus": false,
     "complete": "payload",
+<<<<<<< HEAD
+    "x": 520,
+    "y": 160,
+    "wires": []
+  },
+  {
+    "id": "seguridad.ui.nombre",
+    "type": "ui_text",
+    "z": "coap.tab",
+    "group": "seguridad.ui.group",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "name": "Nombre:",
+    "label": "Nombre:",
+    "format": "{{msg.payload.nombre}}",
+    "layout": "row-spread",
+    "className": "",
+    "x": 730,
+    "y": 520,
+    "wires": []
+  },
+  {
+    "id": "seguridad.ui.estado",
+    "type": "ui_text",
+    "z": "coap.tab",
+    "group": "seguridad.ui.group",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "name": "Estado:",
+    "label": "Estado:",
+    "format": "{{msg.payload.estado}}",
+    "layout": "row-spread",
+    "className": "",
+    "x": 750,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "seguridad.ui.hora",
+    "type": "ui_text",
+    "z": "coap.tab",
+    "group": "seguridad.ui.group",
+    "order": 3,
+    "width": 0,
+    "height": 0,
+    "name": "Hora:",
+    "label": "Hora:",
+    "format": "{{msg.payload.hora}}",
+    "layout": "row-spread",
+    "className": "",
+    "x": 840,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "cam.ultima",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "Guardar ultima persona",
+    "func": "// Solo actualizar cuando la camara detecto a alguien\nif (!msg.payload || !msg.payload.persona) return null;\n\nvar reconocida = !!msg.payload.reconocida;\nvar rec = {\n    nombre: reconocida ? msg.payload.nombre : 'Desconocida',\n    reconocida: reconocida,\n    estado: reconocida ? 'Conocida' : 'DESCONOCIDA',\n    timestamp: new Date().toISOString(),\n    hora: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })\n};\n\nglobal.set('ultima_persona', rec);\nvar gemelo = global.get('gemelo');\nif (gemelo) {\n    gemelo.ultima_persona = rec;\n    global.set('gemelo', gemelo);\n}\n\nnode.status({ fill: reconocida ? 'green' : 'red', shape: 'dot', text: rec.nombre + ' (' + rec.estado + ')' });\nmsg.payload = rec;\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 330,
+    "y": 240,
+    "wires": [
+      [
+        "seguridad.ui.nombre",
+        "seguridad.ui.estado",
+        "seguridad.ui.hora",
+        "cam.ultima.tostr"
+      ]
+    ]
+  },
+  {
+    "id": "cam.ultima.tostr",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "A JSON",
+    "func": "msg.payload = JSON.stringify(msg.payload, null, 2);\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 570,
+    "y": 240,
+    "wires": [
+      [
+        "cam.ultima.file"
+      ]
+    ]
+  },
+  {
+    "id": "cam.ultima.file",
+    "type": "file",
+    "z": "coap.tab",
+    "name": "ultima_persona.json",
+    "filename": "/data/ultima_persona.json",
+    "filenameType": "str",
+    "appendNewline": false,
+    "createDir": false,
+    "overwriteFile": "true",
+    "encoding": "utf8",
+    "x": 780,
+    "y": 240,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "cam.restore.inject",
+    "type": "inject",
+    "z": "coap.tab",
+    "name": "Al iniciar",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": "2",
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 320,
+    "wires": [
+      [
+        "cam.restore.file"
+      ]
+    ]
+  },
+  {
+    "id": "cam.restore.file",
+    "type": "file in",
+    "z": "coap.tab",
+    "name": "Leer ultima_persona.json",
+    "filename": "/data/ultima_persona.json",
+    "filenameType": "str",
+    "format": "utf8",
+    "chunk": false,
+    "sendError": false,
+    "encoding": "utf8",
+    "allProps": false,
+    "x": 340,
+    "y": 320,
+    "wires": [
+      [
+        "cam.restore.parse"
+      ]
+    ]
+  },
+  {
+    "id": "cam.restore.parse",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "Restaurar en contexto",
+    "func": "try {\n    var rec = JSON.parse(msg.payload);\n    if (!rec || !rec.nombre) return null;\n    global.set('ultima_persona', rec);\n    var gemelo = global.get('gemelo');\n    if (gemelo) { gemelo.ultima_persona = rec; global.set('gemelo', gemelo); }\n    msg.payload = rec;\n    return msg;\n} catch (e) { return null; }",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 570,
+    "y": 320,
+    "wires": [
+      [
+        "seguridad.ui.nombre",
+        "seguridad.ui.estado",
+        "seguridad.ui.hora"
+      ]
+    ]
+  },
+  {
+    "id": "cam.foto.ui",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "Foto para dashboard",
+    "func": "if (!msg.payload || !msg.payload.persona) return null;\nvar cap = global.get('ultima_captura');\nif (!cap || !cap.image) return null;\nmsg.payload = {\n    image: cap.image,\n    nombre: cap.reconocida ? cap.nombre : 'Desconocida',\n    hora: cap.hora\n};\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 330,
+    "y": 320,
+    "wires": [
+      [
+        "seguridad.ui.foto"
+      ]
+    ]
+  },
+  {
+    "id": "seguridad.ui.foto",
+    "type": "ui_template",
+    "z": "coap.tab",
+    "group": "seguridad.ui.group",
+    "name": "Foto ultima persona",
+    "order": 4,
+    "width": 0,
+    "height": 0,
+    "format": "<div style=\"text-align:center\">\n  <img ng-if=\"msg.payload.image\" ng-src=\"{{msg.payload.image}}\" style=\"width:100%;border-radius:4px\"/>\n  <div ng-if=\"msg.payload.nombre\" style=\"margin-top:4px;font-size:12px\">{{msg.payload.nombre}} - {{msg.payload.hora}}</div>\n</div>",
+    "storeOutMessages": false,
+    "fwdInMessages": false,
+    "resendOnRefresh": true,
+    "templateScope": "local",
+    "className": "",
+    "x": 630,
+    "y": 320,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "reg.ui.nombre",
+    "type": "ui_text_input",
+    "z": "coap.tab",
+    "name": "Nombre nuevo",
+    "label": "Nombre",
+    "tooltip": "Nombre de la persona a registrar",
+    "group": "reg.ui.group",
+    "order": 1,
+    "width": 0,
+    "height": 0,
+    "passthru": true,
+    "mode": "text",
+    "delay": "300",
+    "topic": "topic",
+    "sendOnBlur": true,
+    "className": "",
+    "topicType": "msg",
+    "x": 150,
+    "y": 600,
+    "wires": [
+      [
+        "reg.nombre.store"
+      ]
+    ]
+  },
+  {
+    "id": "reg.nombre.store",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "Guardar nombre",
+    "func": "global.set('registro_nombre', (msg.payload || '').toString());\nreturn null;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 360,
+    "y": 600,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "reg.ui.btn",
+    "type": "ui_button",
+    "z": "coap.tab",
+    "name": "Guardar persona",
+    "group": "reg.ui.group",
+    "order": 2,
+    "width": 0,
+    "height": 0,
+    "passthru": false,
+    "label": "Guardar ultima persona",
+    "tooltip": "Registra el ultimo rostro detectado con el nombre ingresado",
+    "color": "",
+    "bgcolor": "",
+    "className": "",
+    "icon": "save",
+    "payload": "",
+    "payloadType": "str",
+    "topic": "topic",
+    "topicType": "msg",
+    "x": 160,
+    "y": 660,
+    "wires": [
+      [
+        "reg.preparar"
+      ]
+    ]
+  },
+  {
+    "id": "reg.preparar",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "Preparar registro",
+    "func": "var cap = global.get('ultima_captura');\nvar nombre = (global.get('registro_nombre') || '').toString().trim();\nif (!cap || !cap.image) {\n    return [null, { payload: 'No hay ninguna captura de rostro para guardar' }];\n}\nif (!nombre) {\n    return [null, { payload: 'Escribe el nombre antes de guardar' }];\n}\nmsg.payload = { nombre: nombre, image: cap.image };\nmsg.headers = { 'Content-Type': 'application/json' };\nmsg.requestTimeout = 20000;\nmsg.nombre_registro = nombre;\nnode.status({fill:'blue',shape:'dot',text:'registrando ' + nombre + '...'});\nreturn [msg, null];",
+    "outputs": 2,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 370,
+    "y": 660,
+    "wires": [
+      [
+        "reg.train"
+      ],
+      [
+        "reg.toast"
+      ]
+    ]
+  },
+  {
+    "id": "reg.train",
+    "type": "http request",
+    "z": "coap.tab",
+    "name": "POST api-ia /train",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://api-ia:5000/train",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": true,
+    "headers": [],
+    "x": 600,
+    "y": 660,
+    "wires": [
+      [
+        "reg.resultado"
+      ]
+    ]
+  },
+  {
+    "id": "reg.resultado",
+    "type": "function",
+    "z": "coap.tab",
+    "name": "Resultado registro",
+    "func": "var r = msg.payload || {};\nif (r.success) {\n    node.status({fill:'green',shape:'dot',text:'registrado: ' + msg.nombre_registro});\n    msg.payload = 'Persona guardada: ' + msg.nombre_registro;\n} else {\n    node.status({fill:'red',shape:'ring',text:'fallo el registro'});\n    msg.payload = 'No se pudo guardar: ' + ((r.message || r.errores) ? (r.message + (r.errores ? ' / ' + r.errores.join('; ') : '')) : 'error en la API');\n}\nreturn msg;",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 830,
+    "y": 660,
+    "wires": [
+      [
+        "reg.toast"
+      ]
+    ]
+  },
+  {
+    "id": "reg.toast",
+    "type": "ui_toast",
+    "z": "coap.tab",
+    "position": "top right",
+    "displayTime": "4",
+    "highlight": "",
+    "sendall": true,
+    "outputs": 0,
+    "ok": "OK",
+    "cancel": "",
+    "raw": false,
+    "className": "",
+    "topic": "",
+    "name": "Aviso registro",
+    "x": 1040,
+    "y": 660,
+=======
     "x": 510,
     "y": 380,
+>>>>>>> main
     "wires": []
   },
   {
@@ -1218,18 +1710,26 @@
     ]
   },
   {
+<<<<<<< HEAD
+=======
     "id": "telegram.llm.ask",
     "type": "tab",
     "label": "Telegram LLM",
     "disabled": false
   },
   {
+>>>>>>> main
     "id": "telegram.ask.cmd",
     "type": "telegram command",
     "z": "telegram.llm.ask",
     "name": "/ask",
+<<<<<<< HEAD
+    "command": "/ask",
+    "bot": "bot.telegram",
+=======
     "bot": "bot.telegram",
     "command": "/ask",
+>>>>>>> main
     "outputs": 1,
     "x": 150,
     "y": 120,
@@ -1244,7 +1744,11 @@
     "type": "function",
     "z": "telegram.llm.ask",
     "name": "Construir prompt",
+<<<<<<< HEAD
+    "func": "var gemelo = global.get(\"gemelo\");\nvar chatId = msg.payload.chatId || \"\";\nvar pregunta = String(msg.payload.content || \"\").replace(/^\\/ask\\s*/i, \"\").trim();\nif (!pregunta) {\n  return { payload: { chatId: chatId, type: \"message\", content: \"Uso: /ask <pregunta>\\nEj: /ask como estan los sensores?\" } };\n}\nvar contexto = \"\";\nif (gemelo && gemelo.estado_actual) {\n  var e = gemelo.estado_actual;\n  contexto = \"Datos actuales:\\n- CO2: \" + e.co2 + \" ppm\\n- Distancia: \" + e.distancia + \" cm\\n- Sonido: \" + e.sonido + \" dB\\n- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\n}\nvar prompt = contexto + \"Pregunta: \" + pregunta + \"\\n\\nResponde en espanol de forma breve y clara (max 250 caracteres).\";\nreturn { payload: { model: \"phi3:mini\", prompt: prompt, stream: false, keep_alive: -1 }, chatId: chatId };",
+=======
     "func": "var gemelo = global.get(\"gemelo\");\nvar chatId = msg.payload.chatId || \"\";\nvar pregunta = String(msg.payload.content || \"\").replace(/^\\/ask\\s*/i, \"\").trim();\nif (!pregunta) {\n  return { payload: { chatId: chatId, type: \"message\", content: \"Uso: /ask <pregunta>\\nEj: /ask como estan los sensores?\" } };\n}\nvar contexto = \"\";\nif (gemelo && gemelo.estado_actual) {\n  var e = gemelo.estado_actual;\n  contexto = \"Datos actuales:\\n- CO2: \" + e.co2 + \" ppm\\n- Distancia: \" + e.distancia + \" cm\\n- Sonido: \" + e.sonido + \" dB\\n- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\n}\nvar prompt = contexto + \"Pregunta: \" + pregunta + \"\\n\\nResponde en espanol de forma breve y clara (max 250 caracteres).\";\nreturn { payload: { model: \"phi3:mini\", prompt: prompt, stream: false }, chatId: chatId };",
+>>>>>>> main
     "outputs": 1,
     "x": 340,
     "y": 120,
@@ -1260,19 +1764,35 @@
     "z": "telegram.llm.ask",
     "name": "POST Phi3",
     "method": "POST",
+<<<<<<< HEAD
+    "paytoqs": "ignore",
+    "url": "http://ollama:11434/api/generate",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "insecureHTTPParser": false,
+    "authType": "",
+    "senderr": false,
+    "headers": [],
+=======
     "url": "http://ollama:11434/api/generate",
     "sendBody": true,
     "specifyBody": "json",
     "jsonBody": "={{ payload }}",
+>>>>>>> main
     "x": 540,
     "y": 120,
     "wires": [
       [
         "telegram.ask.fmt"
       ]
+<<<<<<< HEAD
+    ]
+=======
     ],
     "timeout": 120000,
     "retry": "none"
+>>>>>>> main
   },
   {
     "id": "telegram.ask.fmt",
