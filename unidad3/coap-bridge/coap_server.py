@@ -68,6 +68,9 @@ async def main():
     root = resource.Site()
     root.add_resource(["temperatura"], SensorResource("temperatura"))
     root.add_resource(["humedad"], SensorResource("humedad"))
+    root.add_resource(["distancia"], SensorResource("distancia"))
+    root.add_resource(["co2"], SensorResource("co2"))
+    root.add_resource(["sonido"], SensorResource("sonido"))
 
     await aiocoap.Context.create_server_context(root, bind=("0.0.0.0", COAP_PORT))
     print(f"Servidor CoAP escuchando en UDP {COAP_PORT}", flush=True)

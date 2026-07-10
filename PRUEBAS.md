@@ -154,7 +154,7 @@ docker exec mosquitto mosquitto_pub -h localhost -p 1883 -u mkr1000 -P mkr1000_i
 docker exec mosquitto mosquitto_sub -h localhost -p 1883 -u mkr1000 -P mkr1000_iot \
   -t 'smarthome/equipo2/control/#' -v
 ```
-3. Espera el ciclo del agente (hasta 2 min). Si decide encender LED/buzzer, lo verás en `control/led`.
+3. Espera el ciclo del agente (hasta 2 min). Si decide encender el LED, lo verás en `control/led`.
 
 ### Probar directamente la ejecución de acción en cadena
 ```bash
