@@ -24,12 +24,15 @@
         "disabled": false
     },
     {
+<<<<<<< HEAD
         "id": "telegram.llm.ask",
         "type": "tab",
         "label": "Telegram LLM",
         "disabled": false
     },
     {
+=======
+>>>>>>> main
         "id": "gemelo.tls.config",
         "type": "tls-config",
         "name": "TLS Mosquitto",
@@ -390,7 +393,11 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Construir Prompt LLM",
+<<<<<<< HEAD
         "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
+=======
+        "func": "var gemelo = global.get(\"gemelo\");\nvar payload = msg.payload;\nif (!gemelo || !payload || !payload.debeActuar) return null;\n\nvar e = gemelo.estado_actual;\nvar u = gemelo.umbrales;\nvar prompt = \"Eres el sistema de control de una casa inteligente. Tienes 4 sensores: CO2 (MQ7), nivel de sonido, distancia ultrasonica y una camara con reconocimiento facial.\\n\\n\";\nprompt += \"Estado actual del hogar:\\n\";\nprompt += \"- CO2 (MQ7): \" + e.co2 + \" ppm (umbral critico: \" + u.co2.limite + \" ppm)\\n\";\nprompt += \"- Distancia: \" + e.distancia + \" cm (umbral critico: por debajo de \" + u.distancia.limite + \" cm)\\n\";\nprompt += \"- Nivel de sonido: \" + e.sonido + \" dB (umbral critico: \" + u.sonido.limite + \" dB)\\n\";\nprompt += \"- Persona detectada por camara: \" + (e.persona ? \"si\" : \"no\") + (e.persona && e.persona_nombre ? \" (\" + e.persona_nombre + \")\" : \"\") + \"\\n\";\nvar up = global.get('ultima_persona');\nif (up) prompt += \"- Ultima persona detectada: \" + up.nombre + \" (\" + (up.reconocida ? \"conocida\" : \"DESCONOCIDA\") + \") a las \" + up.hora + \"\\n\";\nprompt += \"- Hora local: \" + new Date().toLocaleTimeString() + \"\\n\\n\";\nprompt += \"Motivo de evaluacion: \" + payload.razon + \"\\n\\n\";\nprompt += \"Analiza el estado y responde SOLO en formato JSON valido\\n\";\nprompt += \"con exactamente esta estructura:\\n\";\nprompt += JSON.stringify({\n    nivel_alerta: \"normal|medio|critico\",\n    activar_led: true,\n    mensaje_alerta: \"texto corto\",\n    razonamiento: \"explicacion breve\"\n}, null, 2);\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        prompt: prompt,\n        stream: false,\n        format: \"json\"\n    }\n};",
+>>>>>>> main
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -571,7 +578,11 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
+<<<<<<< HEAD
         "x": 280,
+=======
+        "x": 300,
+>>>>>>> main
         "y": 220,
         "wires": []
     },
@@ -851,7 +862,11 @@
         "type": "function",
         "z": "gemelo.consulta.natural",
         "name": "Construir consulta + contexto",
+<<<<<<< HEAD
         "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"phi3:mini\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+=======
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\nvar up = global.get('ultima_persona');\nif (up) contexto += \"- Ultima persona detectada: \" + up.nombre + \" (\" + (up.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + up.hora + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\nvar regs = global.get('personas_registradas');\nif (Array.isArray(regs)) {\n    contexto += \"Personas registradas en el sistema de reconocimiento facial (\" + regs.length + \"): \";\n    contexto += regs.length ? regs.map(function (p) { return p.nombre; }).join(\", \") : \"ninguna\";\n    contexto += \"\\n\\n\";\n}\nvar hist = global.get('historial_detecciones') || [];\nif (hist.length) {\n    contexto += \"Historial de personas detectadas en las ultimas 24 horas (orden cronologico, cada entrada es una visita distinta):\\n\";\n    hist.slice(-15).forEach(function (h) {\n        contexto += \"- \" + h.nombre + \" (\" + (h.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + h.hora + \"\\n\";\n    });\n    contexto += \"\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};\n",
+>>>>>>> main
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -954,8 +969,13 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
+<<<<<<< HEAD
         "x": 140,
         "y": 100,
+=======
+        "x": 130,
+        "y": 320,
+>>>>>>> main
         "wires": [
             [
                 "cam.url"
@@ -973,8 +993,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 310,
         "y": 100,
+=======
+        "x": 300,
+        "y": 320,
+>>>>>>> main
         "wires": [
             [
                 "cam.get"
@@ -997,8 +1022,13 @@
         "authType": "",
         "senderr": false,
         "headers": [],
+<<<<<<< HEAD
         "x": 510,
         "y": 100,
+=======
+        "x": 500,
+        "y": 320,
+>>>>>>> main
         "wires": [
             [
                 "cam.tob64"
@@ -1016,8 +1046,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 700,
         "y": 100,
+=======
+        "x": 690,
+        "y": 320,
+>>>>>>> main
         "wires": [
             [
                 "cam.recognize"
@@ -1039,8 +1074,13 @@
         "insecureHTTPParser": false,
         "authType": "",
         "headers": [],
+<<<<<<< HEAD
         "x": 920,
         "y": 100,
+=======
+        "x": 910,
+        "y": 320,
+>>>>>>> main
         "wires": [
             [
                 "cam.persona"
@@ -1058,8 +1098,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 310,
         "y": 160,
+=======
+        "x": 300,
+        "y": 380,
+>>>>>>> main
         "wires": [
             [
                 "cam.debug",
@@ -1078,8 +1123,13 @@
         "console": false,
         "tostatus": false,
         "complete": "payload",
+<<<<<<< HEAD
         "x": 520,
         "y": 160,
+=======
+        "x": 510,
+        "y": 380,
+>>>>>>> main
         "wires": []
     },
     {
@@ -1095,8 +1145,13 @@
         "format": "{{msg.payload.nombre}}",
         "layout": "row-spread",
         "className": "",
+<<<<<<< HEAD
         "x": 730,
         "y": 520,
+=======
+        "x": 720,
+        "y": 740,
+>>>>>>> main
         "wires": []
     },
     {
@@ -1112,8 +1167,13 @@
         "format": "{{msg.payload.estado}}",
         "layout": "row-spread",
         "className": "",
+<<<<<<< HEAD
         "x": 750,
         "y": 460,
+=======
+        "x": 740,
+        "y": 680,
+>>>>>>> main
         "wires": []
     },
     {
@@ -1129,8 +1189,13 @@
         "format": "{{msg.payload.hora}}",
         "layout": "row-spread",
         "className": "",
+<<<<<<< HEAD
         "x": 840,
         "y": 300,
+=======
+        "x": 830,
+        "y": 520,
+>>>>>>> main
         "wires": []
     },
     {
@@ -1145,14 +1210,24 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 330,
         "y": 240,
+=======
+        "x": 320,
+        "y": 460,
+>>>>>>> main
         "wires": [
             [
                 "seguridad.ui.nombre",
                 "seguridad.ui.estado",
                 "seguridad.ui.hora",
+<<<<<<< HEAD
                 "cam.ultima.tostr"
+=======
+                "cam.ultima.tostr",
+                "cam.hist"
+>>>>>>> main
             ]
         ]
     },
@@ -1168,8 +1243,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 570,
         "y": 240,
+=======
+        "x": 560,
+        "y": 460,
+>>>>>>> main
         "wires": [
             [
                 "cam.ultima.file"
@@ -1187,8 +1267,13 @@
         "createDir": false,
         "overwriteFile": "true",
         "encoding": "utf8",
+<<<<<<< HEAD
         "x": 780,
         "y": 240,
+=======
+        "x": 770,
+        "y": 460,
+>>>>>>> main
         "wires": [
             []
         ]
@@ -1210,11 +1295,20 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
+<<<<<<< HEAD
         "x": 140,
         "y": 320,
         "wires": [
             [
                 "cam.restore.file"
+=======
+        "x": 130,
+        "y": 540,
+        "wires": [
+            [
+                "cam.restore.file",
+                "cam.hist.restore.file"
+>>>>>>> main
             ]
         ]
     },
@@ -1230,8 +1324,13 @@
         "sendError": false,
         "encoding": "utf8",
         "allProps": false,
+<<<<<<< HEAD
         "x": 340,
         "y": 320,
+=======
+        "x": 330,
+        "y": 540,
+>>>>>>> main
         "wires": [
             [
                 "cam.restore.parse"
@@ -1250,8 +1349,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 570,
         "y": 320,
+=======
+        "x": 560,
+        "y": 540,
+>>>>>>> main
         "wires": [
             [
                 "seguridad.ui.nombre",
@@ -1272,11 +1376,20 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 330,
         "y": 320,
         "wires": [
             [
                 "seguridad.ui.foto"
+=======
+        "x": 320,
+        "y": 540,
+        "wires": [
+            [
+                "seguridad.ui.foto",
+                "reg.ui.foto"
+>>>>>>> main
             ]
         ]
     },
@@ -1295,8 +1408,34 @@
         "resendOnRefresh": true,
         "templateScope": "local",
         "className": "",
+<<<<<<< HEAD
         "x": 630,
         "y": 320,
+=======
+        "x": 620,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "reg.ui.foto",
+        "type": "ui_template",
+        "z": "coap.tab",
+        "group": "reg.ui.group",
+        "name": "Foto a guardar",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "format": "<div style=\"text-align:center\">\n  <div style=\"font-size:12px;font-weight:bold;margin-bottom:4px\">Se guardará esta persona:</div>\n  <img ng-if=\"msg.payload.image\" ng-src=\"{{msg.payload.image}}\" style=\"width:100%;border-radius:4px\"/>\n  <div ng-if=\"!msg.payload.image\" style=\"font-size:12px;color:#999;padding:12px 0\">Sin captura todavía</div>\n  <div ng-if=\"msg.payload.hora\" style=\"margin-top:4px;font-size:11px;color:#777\">Capturada: {{msg.payload.hora}}</div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 630,
+        "y": 600,
+>>>>>>> main
         "wires": [
             []
         ]
@@ -1309,7 +1448,11 @@
         "label": "Nombre",
         "tooltip": "Nombre de la persona a registrar",
         "group": "reg.ui.group",
+<<<<<<< HEAD
         "order": 1,
+=======
+        "order": 2,
+>>>>>>> main
         "width": 0,
         "height": 0,
         "passthru": true,
@@ -1319,8 +1462,13 @@
         "sendOnBlur": true,
         "className": "",
         "topicType": "msg",
+<<<<<<< HEAD
         "x": 150,
         "y": 600,
+=======
+        "x": 140,
+        "y": 820,
+>>>>>>> main
         "wires": [
             [
                 "reg.nombre.store"
@@ -1339,8 +1487,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 360,
         "y": 600,
+=======
+        "x": 350,
+        "y": 820,
+>>>>>>> main
         "wires": [
             []
         ]
@@ -1351,7 +1504,11 @@
         "z": "coap.tab",
         "name": "Guardar persona",
         "group": "reg.ui.group",
+<<<<<<< HEAD
         "order": 2,
+=======
+        "order": 3,
+>>>>>>> main
         "width": 0,
         "height": 0,
         "passthru": false,
@@ -1365,8 +1522,13 @@
         "payloadType": "str",
         "topic": "topic",
         "topicType": "msg",
+<<<<<<< HEAD
         "x": 160,
         "y": 660,
+=======
+        "x": 150,
+        "y": 880,
+>>>>>>> main
         "wires": [
             [
                 "reg.preparar"
@@ -1385,8 +1547,13 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 370,
         "y": 660,
+=======
+        "x": 360,
+        "y": 880,
+>>>>>>> main
         "wires": [
             [
                 "reg.train"
@@ -1412,8 +1579,13 @@
         "authType": "",
         "senderr": true,
         "headers": [],
+<<<<<<< HEAD
         "x": 600,
         "y": 660,
+=======
+        "x": 590,
+        "y": 880,
+>>>>>>> main
         "wires": [
             [
                 "reg.resultado"
@@ -1432,11 +1604,20 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
+<<<<<<< HEAD
         "x": 830,
         "y": 660,
         "wires": [
             [
                 "reg.toast"
+=======
+        "x": 820,
+        "y": 880,
+        "wires": [
+            [
+                "reg.toast",
+                "faces.get"
+>>>>>>> main
             ]
         ]
     },
@@ -1455,8 +1636,13 @@
         "className": "",
         "topic": "",
         "name": "Aviso registro",
+<<<<<<< HEAD
         "x": 1040,
         "y": 660,
+=======
+        "x": 1030,
+        "y": 880,
+>>>>>>> main
         "wires": []
     },
     {
@@ -1635,6 +1821,7 @@
         ]
     },
     {
+<<<<<<< HEAD
         "id": "telegram.ask.cmd",
         "type": "telegram command",
         "z": "telegram.llm.ask",
@@ -1662,10 +1849,29 @@
         "wires": [
             [
                 "telegram.ask.http"
+=======
+        "id": "cam.hist",
+        "type": "function",
+        "z": "coap.tab",
+        "name": "Actualizar historial",
+        "func": "// Mantener historial de detecciones para consultas al LLM\nvar rec = msg.payload;\nif (!rec || !rec.nombre) return null;\n\nvar hist = global.get('historial_detecciones') || [];\nvar ahora = new Date(rec.timestamp).getTime();\nvar last = hist[hist.length - 1];\n\n// Misma persona vista hace menos de 5 min: es la misma visita, no duplicar\nif (last && last.nombre === rec.nombre && (ahora - new Date(last.timestamp).getTime()) < 5 * 60 * 1000) {\n    last.timestamp = rec.timestamp;\n    global.set('historial_detecciones', hist);\n    return null;\n}\n\nhist.push({ nombre: rec.nombre, reconocida: rec.reconocida, timestamp: rec.timestamp, hora: rec.hora });\n\n// Conservar solo las ultimas 24 horas, maximo 50 entradas\nvar corte = ahora - 24 * 60 * 60 * 1000;\nhist = hist.filter(function (h) { return new Date(h.timestamp).getTime() >= corte; }).slice(-50);\n\nglobal.set('historial_detecciones', hist);\nnode.status({ fill: 'blue', shape: 'dot', text: hist.length + ' detecciones en 24h' });\nmsg.payload = JSON.stringify(hist, null, 2);\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 330,
+        "y": 620,
+        "wires": [
+            [
+                "cam.hist.file"
+>>>>>>> main
             ]
         ]
     },
     {
+<<<<<<< HEAD
         "id": "telegram.ask.http",
         "type": "http request",
         "z": "telegram.llm.ask",
@@ -1673,6 +1879,96 @@
         "method": "POST",
         "paytoqs": "ignore",
         "url": "http://ollama:11434/api/generate",
+=======
+        "id": "cam.hist.file",
+        "type": "file",
+        "z": "coap.tab",
+        "name": "historial_detecciones.json",
+        "filename": "/data/historial_detecciones.json",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "utf8",
+        "x": 590,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cam.hist.restore.file",
+        "type": "file in",
+        "z": "coap.tab",
+        "name": "Leer historial_detecciones.json",
+        "filename": "/data/historial_detecciones.json",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "utf8",
+        "allProps": false,
+        "x": 350,
+        "y": 680,
+        "wires": [
+            [
+                "cam.hist.restore.parse"
+            ]
+        ]
+    },
+    {
+        "id": "cam.hist.restore.parse",
+        "type": "function",
+        "z": "coap.tab",
+        "name": "Restaurar historial",
+        "func": "try {\n    var hist = JSON.parse(msg.payload);\n    if (!Array.isArray(hist)) return null;\n    var corte = Date.now() - 24 * 60 * 60 * 1000;\n    hist = hist.filter(function (h) { return new Date(h.timestamp).getTime() >= corte; });\n    global.set('historial_detecciones', hist);\n    node.status({ fill: 'green', shape: 'dot', text: hist.length + ' restauradas' });\n} catch (e) {}\nreturn null;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 680,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "faces.tick",
+        "type": "inject",
+        "z": "coap.tab",
+        "name": "Cada 5 min",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "300",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "5",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 740,
+        "wires": [
+            [
+                "faces.get"
+            ]
+        ]
+    },
+    {
+        "id": "faces.get",
+        "type": "http request",
+        "z": "coap.tab",
+        "name": "GET api-ia /faces",
+        "method": "GET",
+        "ret": "obj",
+        "paytoqs": "ignore",
+        "url": "http://api-ia:5000/faces",
+>>>>>>> main
         "tls": "",
         "persist": false,
         "proxy": "",
@@ -1680,15 +1976,24 @@
         "authType": "",
         "senderr": false,
         "headers": [],
+<<<<<<< HEAD
         "x": 540,
         "y": 120,
         "wires": [
             [
                 "telegram.ask.fmt"
+=======
+        "x": 330,
+        "y": 740,
+        "wires": [
+            [
+                "faces.store"
+>>>>>>> main
             ]
         ]
     },
     {
+<<<<<<< HEAD
         "id": "telegram.ask.fmt",
         "type": "function",
         "z": "telegram.llm.ask",
@@ -1712,8 +2017,27 @@
         "outputs": 1,
         "x": 920,
         "y": 120,
+=======
+        "id": "faces.store",
+        "type": "function",
+        "z": "coap.tab",
+        "name": "Guardar personas registradas",
+        "func": "var r = msg.payload || {};\nif (r.success && Array.isArray(r.personas)) {\n    global.set('personas_registradas', r.personas);\n    node.status({ fill: 'green', shape: 'dot', text: r.total + ' personas registradas' });\n} else {\n    node.status({ fill: 'yellow', shape: 'ring', text: 'api-ia sin respuesta valida' });\n}\nreturn null;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 590,
+        "y": 740,
+>>>>>>> main
         "wires": [
             []
         ]
     }
+<<<<<<< HEAD
 ]
+=======
+]
+>>>>>>> main

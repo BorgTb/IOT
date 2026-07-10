@@ -138,6 +138,12 @@ void setup() {
 
     esp_camera_init(&config);
 
+    // Reflexión en el eje X: la cámara viene invertida verticalmente
+    sensor_t *s = esp_camera_sensor_get();
+    if (s) {
+        s->set_vflip(s, 1);
+    }
+
     WiFi.mode(WIFI_STA);
     WiFi.begin(ssid, password);
     while (WiFi.status() != WL_CONNECTED) { delay(500); }
