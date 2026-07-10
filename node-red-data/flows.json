@@ -601,7 +601,7 @@
         "type": "function",
         "z": "gemelo.digital",
         "name": "Aplicar umbral al gemelo",
-        "func": "var topic = msg.topic || \"\";\nvar sensor = topic.split(\"/\").pop();\nvar data = typeof msg.payload === \"string\" ? JSON.parse(msg.payload) : msg.payload;\nif (!data || data.limite === undefined) return null;\n\nvar persist = global.get(\"umbrales_persistidos\") || {};\npersist[sensor] = data.limite;\nglobal.set(\"umbrales_persistidos\", persist);\n\nvar gemelo = global.get(\"gemelo\");\nif (gemelo && gemelo.umbrales && gemelo.umbrales[sensor]) {\n    gemelo.umbrales[sensor].limite = data.limite;\n    global.set(\"gemelo\", gemelo);\n}\nnode.status({fill:\"grey\",shape:\"dot\",text:sensor + \"=\" + data.limite});\nreturn null;",
+        "func": "var topic = msg.topic || \"\";\nvar sensor = topic.split(\"/\").pop();\nvar data = typeof msg.payload === \"string\" ? JSON.parse(msg.payload) : msg.payload;\nif (!data || data.limite === undefined) return null;\n\nvar persist = global.get(\"umbrales_persistidos\") || {};\npersist[sensor] = data.limite;\nglobal.set(\"umbrales_persistidos\", persist);\n\nvar gemelo = global.get(\"gemelo\");\nif (gemelo && gemelo.umbrales && gemelo.umbrales[sensor]) {\n    gemelo.umbrales[sensor].limite = data.limite;\n    global.set(\"gemelo\", gemelo);\n}\nnode.status({fill:\"grey\",shape:\"dot\",text:sensor + \"=\" + data.limite});\nmsg.payload = JSON.stringify(persist, null, 2);\nreturn msg;\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -610,7 +610,9 @@
         "x": 370,
         "y": 720,
         "wires": [
-            []
+            [
+                "gemelo.umbrales.file"
+            ]
         ]
     },
     {
@@ -828,7 +830,7 @@
         "type": "function",
         "z": "gemelo.consulta.natural",
         "name": "Detectar comando de umbral",
-        "func": "var texto = String(msg.payload || \"\").toLowerCase();\nvar gemelo = global.get(\"gemelo\");\nif (!gemelo) return [null, null];\nif (!gemelo.umbrales) gemelo.umbrales = { co2:{limite:400,direccion:\"mayor\",unidad:\"ppm\"}, sonido:{limite:80,direccion:\"mayor\",unidad:\"dB\"}, distancia:{limite:20,direccion:\"menor\",unidad:\"cm\"} };\n\nvar esComando = /(l[i??]mite|umbral|cr[i??]tic|peligros|establece|pon|deja|cambia|configura|ajusta|fija|setea)/.test(texto);\nvar sensor = null;\nif (/(co2|gas|di[o??]xido|mq7)/.test(texto)) sensor = \"co2\";\nelse if (/(sonido|ruido|decibel)/.test(texto)) sensor = \"sonido\";\nelse if (/(distancia|proximidad|cercan)/.test(texto)) sensor = \"distancia\";\n\nvar m = texto.match(/\\b(\\d+(?:[.,]\\d+)?)\\b/);\nvar valor = m ? parseFloat(m[1].replace(\",\", \".\")) : null;\n\nif (esComando && sensor && valor !== null && !isNaN(valor)) {\n    gemelo.umbrales[sensor].limite = valor;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    var un = gemelo.umbrales[sensor].unidad;\n    var dir = gemelo.umbrales[sensor].direccion === \"menor\" ? \"por debajo de\" : \"por encima de\";\n    var nombre = sensor === \"co2\" ? \"CO2\" : sensor;\n    msg.payload = \"Listo. El limite critico de \" + nombre + \" quedo en \" + valor + \" \" + un + \". A partir de ahora se considera peligroso \" + dir + \" \" + valor + \" \" + un + \".\";\n    node.status({fill:\"blue\",shape:\"dot\",text:nombre + \" = \" + valor});\n    var umbralMsg = { topic: \"smarthome/equipo2/umbrales/\" + sensor, payload: JSON.stringify({ limite: valor, direccion: gemelo.umbrales[sensor].direccion, unidad: un }), retain: true };\n    return [msg, null, umbralMsg];\n}\nreturn [null, msg, null];",
+        "func": "var texto = String(msg.payload || \"\").toLowerCase();\nvar gemelo = global.get(\"gemelo\");\nif (!gemelo) return [null, null];\nif (!gemelo.umbrales) gemelo.umbrales = { co2:{limite:400,direccion:\"mayor\",unidad:\"ppm\"}, sonido:{limite:80,direccion:\"mayor\",unidad:\"dB\"}, distancia:{limite:20,direccion:\"menor\",unidad:\"cm\"} };\n\nvar esComando = /(l[ií]mite|umbral|cr[ií]tic|peligros|establece|pon|deja|cambia|configura|ajusta|fija|setea)/.test(texto);\nvar sensor = null;\nif (/(co2|gas|di[oó]xido|mq7)/.test(texto)) sensor = \"co2\";\nelse if (/(sonido|ruido|decibel)/.test(texto)) sensor = \"sonido\";\nelse if (/(distancia|proximidad|cercan)/.test(texto)) sensor = \"distancia\";\n\nvar m = texto.match(/\\b(\\d+(?:[.,]\\d+)?)\\b/);\nvar valor = m ? parseFloat(m[1].replace(\",\", \".\")) : null;\n\nif (esComando && sensor && valor !== null && !isNaN(valor)) {\n    gemelo.umbrales[sensor].limite = valor;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    var un = gemelo.umbrales[sensor].unidad;\n    var dir = gemelo.umbrales[sensor].direccion === \"menor\" ? \"por debajo de\" : \"por encima de\";\n    var nombre = sensor === \"co2\" ? \"CO2\" : sensor;\n    msg.payload = \"Listo. El limite critico de \" + nombre + \" quedo en \" + valor + \" \" + un + \". A partir de ahora se considera peligroso \" + dir + \" \" + valor + \" \" + un + \".\";\n    node.status({fill:\"blue\",shape:\"dot\",text:nombre + \" = \" + valor});\n    var umbralMsg = { topic: \"smarthome/equipo2/umbrales/\" + sensor, payload: JSON.stringify({ limite: valor, direccion: gemelo.umbrales[sensor].direccion, unidad: un }), retain: true };\n    return [msg, null, umbralMsg];\n}\nreturn [null, msg, null];",
         "outputs": 3,
         "noerr": 0,
         "initialize": "",
@@ -867,7 +869,7 @@
         "type": "function",
         "z": "gemelo.consulta.natural",
         "name": "Construir consulta + contexto",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\nvar up = global.get('ultima_persona');\nif (up) contexto += \"- Ultima persona detectada: \" + up.nombre + \" (\" + (up.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + up.hora + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\nvar regs = global.get('personas_registradas');\nif (Array.isArray(regs)) {\n    contexto += \"Personas registradas en el sistema de reconocimiento facial (\" + regs.length + \"): \";\n    contexto += regs.length ? regs.map(function (p) { return p.nombre; }).join(\", \") : \"ninguna\";\n    contexto += \"\\n\\n\";\n}\nvar hist = global.get('historial_detecciones') || [];\nif (hist.length) {\n    contexto += \"Historial de personas detectadas en las ultimas 24 horas (orden cronologico, cada entrada es una visita distinta):\\n\";\n    hist.slice(-15).forEach(function (h) {\n        contexto += \"- \" + h.nombre + \" (\" + (h.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + h.hora + \"\\n\";\n    });\n    contexto += \"\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};\n",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\nvar up = global.get('ultima_persona');\nif (up) contexto += \"- Ultima persona detectada: \" + up.nombre + \" (\" + (up.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + up.hora + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\nvar regs = global.get('personas_registradas');\nif (Array.isArray(regs)) {\n    contexto += \"Personas registradas en el sistema de reconocimiento facial (\" + regs.length + \"): \";\n    contexto += regs.length ? regs.map(function (p) { return p.nombre; }).join(\", \") : \"ninguna\";\n    contexto += \"\\n\\n\";\n}\nvar hist = global.get('historial_detecciones') || [];\nif (hist.length) {\n    contexto += \"Historial de personas detectadas en las ultimas 24 horas (orden cronologico, cada entrada es una visita distinta):\\n\";\n    hist.slice(-15).forEach(function (h) {\n        contexto += \"- \" + h.nombre + \" (\" + (h.reconocida ? \"conocida\" : \"desconocida\") + \") a las \" + h.hora + \"\\n\";\n    });\n    contexto += \"\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta + \"\\n\\n\";\ncontexto += \"Tienes una herramienta para MODIFICAR los umbrales guardados. Responde SOLO con JSON valido:\\n\";\ncontexto += \"- Para responder normalmente: {\\\"accion\\\":\\\"responder\\\",\\\"texto\\\":\\\"tu respuesta\\\"}\\n\";\ncontexto += \"- Si el usuario pide cambiar/ajustar/establecer un umbral o limite: {\\\"accion\\\":\\\"cambiar_umbral\\\",\\\"sensor\\\":\\\"co2|sonido|distancia\\\",\\\"valor\\\":numero,\\\"texto\\\":\\\"confirmacion breve\\\"}\\n\";\ncontexto += \"El cambio se aplica de verdad en la base de datos del sistema; no digas que no puedes hacerlo.\";\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente con permiso para modificar los umbrales del sistema mediante la accion cambiar_umbral. Responde SIEMPRE en espanol, breve y preciso, usando solo los datos proporcionados. Responde unicamente JSON valido.\",\n        prompt: contexto,\n        stream: false,\n        format: \"json\"\n    }\n};\n",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -908,9 +910,9 @@
         "id": "gemelo.consulta.response",
         "type": "function",
         "z": "gemelo.consulta.natural",
-        "name": "Formatear respuesta",
-        "func": "var respuesta = msg.payload?.response || \"No se pudo obtener respuesta\";\nreturn { payload: respuesta };",
-        "outputs": 1,
+        "name": "Ejecutar accion LLM",
+        "func": "var payload = msg.payload;\nif (!payload || !payload.response) return [{ payload: \"No se pudo obtener respuesta\" }, null];\n\nvar texto = payload.response;\nvar umbralMsg = null;\ntry {\n    var d = JSON.parse(payload.response);\n    if (d.accion === 'cambiar_umbral') {\n        var gemelo = global.get('gemelo');\n        var valor = parseFloat(d.valor);\n        var sensor = String(d.sensor || '').toLowerCase();\n        if (sensor === 'gas') sensor = 'co2';\n        if (gemelo && gemelo.umbrales && gemelo.umbrales[sensor] && !isNaN(valor)) {\n            gemelo.umbrales[sensor].limite = valor;\n            gemelo.ultimo_update = new Date().toISOString();\n            global.set('gemelo', gemelo);\n            var u = gemelo.umbrales[sensor];\n            var dir = u.direccion === 'menor' ? 'por debajo de' : 'por encima de';\n            texto = d.texto || ('Listo. Umbral de ' + sensor + ' = ' + valor + ' ' + u.unidad + '.');\n            texto += ' (Se considera peligroso ' + dir + ' ' + valor + ' ' + u.unidad + '.)';\n            umbralMsg = { topic: 'smarthome/equipo2/umbrales/' + sensor, payload: JSON.stringify({ limite: valor, direccion: u.direccion, unidad: u.unidad }), retain: true };\n            node.status({ fill: 'blue', shape: 'dot', text: sensor + ' = ' + valor });\n        } else {\n            texto = 'La IA pidio cambiar un umbral invalido (' + d.sensor + '=' + d.valor + '); no se aplico.';\n        }\n    } else {\n        texto = d.texto || d.respuesta || payload.response;\n    }\n} catch (e) {\n    // el modelo respondio texto plano: mostrarlo tal cual\n}\nreturn [{ payload: texto }, umbralMsg];\n",
+        "outputs": 2,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
@@ -921,6 +923,9 @@
             [
                 "gemelo.consulta.output",
                 "gemelo.mqtt.respuesta"
+            ],
+            [
+                "gemelo.mqtt.umbral"
             ]
         ]
     },
@@ -1803,7 +1808,7 @@
         "y": 120,
         "wires": [
             [
-                "telegram.ask.build"
+                "telegram.ask.umbral"
             ]
         ]
     },
@@ -1812,13 +1817,16 @@
         "type": "function",
         "z": "telegram.llm.ask",
         "name": "Construir prompt",
-        "func": "var gemelo = global.get(\"gemelo\");\nvar chatId = msg.payload.chatId || \"\";\nvar pregunta = String(msg.payload.content || \"\").replace(/^\\/ask\\s*/i, \"\").trim();\nif (!pregunta) {\n  return { payload: { chatId: chatId, type: \"message\", content: \"Uso: /ask <pregunta>\\nEj: /ask como estan los sensores?\" } };\n}\nvar contexto = \"\";\nif (gemelo && gemelo.estado_actual) {\n  var e = gemelo.estado_actual;\n  contexto = \"Datos actuales:\\n- CO2: \" + e.co2 + \" ppm\\n- Distancia: \" + e.distancia + \" cm\\n- Sonido: \" + e.sonido + \" dB\\n- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\n}\nvar prompt = contexto + \"Pregunta: \" + pregunta + \"\\n\\nResponde en espanol de forma breve y clara (max 250 caracteres).\";\nreturn { payload: { model: \"phi3:mini\", prompt: prompt, stream: false, keep_alive: -1 }, chatId: chatId };",
-        "outputs": 1,
+        "func": "var gemelo = global.get(\"gemelo\");\nvar chatId = msg.payload.chatId || \"\";\nvar pregunta = String(msg.payload.content || \"\").replace(/^\\/ask\\s*/i, \"\").trim();\nif (!pregunta) {\n  return [null, { payload: { chatId: chatId, type: \"message\", content: \"Uso: /ask <pregunta>\\nEj: /ask como estan los sensores?\" } }];\n}\nvar contexto = \"\";\nif (gemelo && gemelo.estado_actual) {\n  var e = gemelo.estado_actual;\n  contexto = \"Datos actuales:\\n- CO2: \" + e.co2 + \" ppm\\n- Distancia: \" + e.distancia + \" cm\\n- Sonido: \" + e.sonido + \" dB\\n- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\";\n}\nif (gemelo && gemelo.umbrales) {\n  var u = gemelo.umbrales;\n  contexto += \"Umbrales guardados: CO2 \" + u.co2.limite + \" ppm, sonido \" + u.sonido.limite + \" dB, distancia \" + u.distancia.limite + \" cm\\n\\n\";\n}\nvar prompt = contexto + \"Pregunta: \" + pregunta + \"\\n\\n\";\nprompt += \"Puedes MODIFICAR los umbrales guardados. Responde SOLO JSON valido:\\n\";\nprompt += '- Respuesta normal: {\"accion\":\"responder\",\"texto\":\"respuesta breve, max 250 caracteres, en espanol\"}\\n';\nprompt += '- Cambiar umbral: {\"accion\":\"cambiar_umbral\",\"sensor\":\"co2|sonido|distancia\",\"valor\":numero,\"texto\":\"confirmacion\"}';\nreturn [{ payload: { model: \"llama3.2:3b\", prompt: prompt, stream: false, keep_alive: -1, format: \"json\" }, chatId: chatId }, null];\n",
+        "outputs": 2,
         "x": 340,
         "y": 120,
         "wires": [
             [
                 "telegram.ask.http"
+            ],
+            [
+                "telegram.ask.send"
             ]
         ]
     },
@@ -1826,7 +1834,7 @@
         "id": "telegram.ask.http",
         "type": "http request",
         "z": "telegram.llm.ask",
-        "name": "POST Phi3",
+        "name": "POST Ollama",
         "method": "POST",
         "ret": "obj",
         "paytoqs": "ignore",
@@ -1850,14 +1858,17 @@
         "id": "telegram.ask.fmt",
         "type": "function",
         "z": "telegram.llm.ask",
-        "name": "Formatear respuesta",
-        "func": "var respuesta = msg.payload?.response || \"No se pudo obtener respuesta\";\nrespuesta = respuesta.replace(/\"/g, \"\").trim();\nvar chatId = msg.chatId;\nreturn { payload: { chatId: chatId, type: \"message\", content: respuesta } };",
-        "outputs": 1,
+        "name": "Ejecutar accion LLM",
+        "func": "var chatId = msg.chatId;\nvar respuesta = (msg.payload && msg.payload.response) || \"No se pudo obtener respuesta\";\nvar texto = String(respuesta).replace(/\\\"/g, '').trim();\nvar umbralMsg = null;\ntry {\n    var d = JSON.parse(respuesta);\n    if (d.accion === 'cambiar_umbral') {\n        var gemelo = global.get('gemelo');\n        var valor = parseFloat(d.valor);\n        var sensor = String(d.sensor || '').toLowerCase();\n        if (sensor === 'gas') sensor = 'co2';\n        if (gemelo && gemelo.umbrales && gemelo.umbrales[sensor] && !isNaN(valor)) {\n            gemelo.umbrales[sensor].limite = valor;\n            gemelo.ultimo_update = new Date().toISOString();\n            global.set('gemelo', gemelo);\n            var u = gemelo.umbrales[sensor];\n            texto = (d.texto || ('Listo. Umbral de ' + sensor + ' = ' + valor + ' ' + u.unidad + '.'));\n            umbralMsg = { topic: 'smarthome/equipo2/umbrales/' + sensor, payload: JSON.stringify({ limite: valor, direccion: u.direccion, unidad: u.unidad }), retain: true };\n            node.status({ fill: 'blue', shape: 'dot', text: sensor + ' = ' + valor });\n        } else {\n            texto = 'El modelo pidio un umbral invalido; no se aplico.';\n        }\n    } else if (d.texto) {\n        texto = d.texto;\n    }\n} catch (e) {\n    // texto plano: se envia tal cual\n}\nreturn [{ payload: { chatId: chatId, type: 'message', content: texto } }, umbralMsg];\n",
+        "outputs": 2,
         "x": 730,
         "y": 120,
         "wires": [
             [
                 "telegram.ask.send"
+            ],
+            [
+                "telegram.umbral.mqtt"
             ]
         ]
     },
@@ -1943,6 +1954,193 @@
         "headers": {},
         "x": 840,
         "y": 960,
+        "wires": []
+    },
+    {
+        "type": "telegram command",
+        "bot": "bot.telegram",
+        "strict": false,
+        "hasresponse": false,
+        "useregex": false,
+        "outputs": 2,
+        "id": "telegram.umbral.cmd",
+        "z": "telegram.llm.ask",
+        "name": "Comando /umbral",
+        "command": "/umbral",
+        "x": 140,
+        "y": 240,
+        "wires": [
+            [
+                "telegram.umbral.parse"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "telegram.umbral.parse",
+        "type": "function",
+        "z": "telegram.llm.ask",
+        "name": "Cambiar umbral",
+        "func": "// /umbral                     -> muestra los umbrales actuales\n// /umbral <sensor> <valor>    -> cambia el umbral (co2 | sonido | distancia)\nvar chatId = msg.payload.chatId;\nvar texto = String(msg.payload.content || '').replace(/^\\/umbral\\s*/i, '').trim();\nvar gemelo = global.get('gemelo');\nvar umbrales = (gemelo && gemelo.umbrales) || { co2:{limite:400,direccion:'mayor',unidad:'ppm'}, sonido:{limite:80,direccion:'mayor',unidad:'dB'}, distancia:{limite:20,direccion:'menor',unidad:'cm'} };\n\nif (!texto) {\n    var lineas = Object.keys(umbrales).map(function (s) {\n        var u = umbrales[s];\n        var dir = u.direccion === 'menor' ? 'peligroso por debajo de' : 'peligroso por encima de';\n        return '- ' + s + ': ' + u.limite + ' ' + u.unidad + ' (' + dir + ')';\n    });\n    msg.payload = { chatId: chatId, type: 'message', content: 'Umbrales actuales:\\n' + lineas.join('\\n') + '\\n\\nPara cambiar: /umbral <co2|sonido|distancia> <valor>' };\n    return [msg, null];\n}\n\nvar partes = texto.split(/\\s+/);\nvar sensor = (partes[0] || '').toLowerCase();\nif (sensor === 'gas') sensor = 'co2';\nif (sensor === 'ruido') sensor = 'sonido';\nvar valor = parseFloat((partes[1] || '').replace(',', '.'));\n\nif (!umbrales[sensor] || isNaN(valor)) {\n    msg.payload = { chatId: chatId, type: 'message', content: 'Uso: /umbral <co2|sonido|distancia> <valor>\\nEj: /umbral sonido 60' };\n    return [msg, null];\n}\n\numbrales[sensor].limite = valor;\nif (gemelo) { gemelo.umbrales = umbrales; gemelo.ultimo_update = new Date().toISOString(); global.set('gemelo', gemelo); }\n\nvar u = umbrales[sensor];\nvar dir2 = u.direccion === 'menor' ? 'por debajo de' : 'por encima de';\nmsg.payload = { chatId: chatId, type: 'message', content: 'Listo. Umbral de ' + sensor + ' = ' + valor + ' ' + u.unidad + '. Se considera peligroso ' + dir2 + ' ' + valor + ' ' + u.unidad + '.' };\nvar umbralMsg = { topic: 'smarthome/equipo2/umbrales/' + sensor, payload: JSON.stringify({ limite: valor, direccion: u.direccion, unidad: u.unidad }), retain: true };\nnode.status({ fill: 'blue', shape: 'dot', text: sensor + ' = ' + valor });\nreturn [msg, umbralMsg];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 240,
+        "wires": [
+            [
+                "telegram.ask.send"
+            ],
+            [
+                "telegram.umbral.mqtt"
+            ]
+        ]
+    },
+    {
+        "id": "telegram.umbral.mqtt",
+        "type": "mqtt out",
+        "z": "telegram.llm.ask",
+        "name": "Publicar umbral (retenido)",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "367352e091ce6828",
+        "x": 620,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "telegram.ask.umbral",
+        "type": "function",
+        "z": "telegram.llm.ask",
+        "name": "Detectar umbral en /ask",
+        "func": "// Detecta ordenes de umbral en lenguaje natural antes de pasar la pregunta al LLM\nvar chatId = msg.payload.chatId || '';\nvar texto = String(msg.payload.content || '').replace(/^\\/ask\\s*/i, '').toLowerCase();\nvar gemelo = global.get('gemelo');\nif (!gemelo) return [null, msg, null];\nif (!gemelo.umbrales) gemelo.umbrales = { co2:{limite:400,direccion:'mayor',unidad:'ppm'}, sonido:{limite:80,direccion:'mayor',unidad:'dB'}, distancia:{limite:20,direccion:'menor',unidad:'cm'} };\n\nvar esComando = /(l[ií]mite|umbral|cr[ií]tic|peligros|establece|pon|deja|cambia|configura|ajusta|fija|setea)/.test(texto);\nvar sensor = null;\nif (/(co2|gas|di[oó]xido|mq7)/.test(texto)) sensor = 'co2';\nelse if (/(sonido|ruido|decibel)/.test(texto)) sensor = 'sonido';\nelse if (/(distancia|proximidad|cercan)/.test(texto)) sensor = 'distancia';\n\nvar m = texto.match(/\\b(\\d+(?:[.,]\\d+)?)\\b/);\nvar valor = m ? parseFloat(m[1].replace(',', '.')) : null;\n\nif (esComando && sensor && valor !== null && !isNaN(valor)) {\n    gemelo.umbrales[sensor].limite = valor;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set('gemelo', gemelo);\n    var u = gemelo.umbrales[sensor];\n    var dir = u.direccion === 'menor' ? 'por debajo de' : 'por encima de';\n    var conf = { payload: { chatId: chatId, type: 'message', content: 'Listo. Umbral de ' + sensor + ' = ' + valor + ' ' + u.unidad + '. Se considera peligroso ' + dir + ' ' + valor + ' ' + u.unidad + '.' } };\n    var umbralMsg = { topic: 'smarthome/equipo2/umbrales/' + sensor, payload: JSON.stringify({ limite: valor, direccion: u.direccion, unidad: u.unidad }), retain: true };\n    node.status({ fill: 'blue', shape: 'dot', text: sensor + ' = ' + valor });\n    return [conf, null, umbralMsg];\n}\nreturn [null, msg, null];\n",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 120,
+        "wires": [
+            [
+                "telegram.ask.send"
+            ],
+            [
+                "telegram.ask.build"
+            ],
+            [
+                "telegram.umbral.mqtt"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.umbrales.file",
+        "type": "file",
+        "z": "gemelo.digital",
+        "name": "umbrales.json",
+        "filename": "/data/umbrales.json",
+        "filenameType": "str",
+        "appendNewline": false,
+        "createDir": false,
+        "overwriteFile": "true",
+        "encoding": "utf8",
+        "x": 900,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "gemelo.umbrales.restore.inject",
+        "type": "inject",
+        "z": "gemelo.digital",
+        "name": "Al iniciar",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "3",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 460,
+        "wires": [
+            [
+                "gemelo.umbrales.restore.file"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.umbrales.restore.file",
+        "type": "file in",
+        "z": "gemelo.digital",
+        "name": "Leer umbrales.json",
+        "filename": "/data/umbrales.json",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "utf8",
+        "allProps": false,
+        "x": 330,
+        "y": 460,
+        "wires": [
+            [
+                "gemelo.umbrales.restore.parse"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.umbrales.restore.parse",
+        "type": "function",
+        "z": "gemelo.digital",
+        "name": "Republicar umbrales guardados",
+        "func": "// Republica cada umbral guardado como mensaje MQTT retenido:\n// asi el gemelo, la IA y n8n quedan sincronizados aunque mosquitto haya perdido lo retenido.\ntry {\n    var persist = JSON.parse(msg.payload);\n    var meta = {\n        co2: { direccion: 'mayor', unidad: 'ppm' },\n        sonido: { direccion: 'mayor', unidad: 'dB' },\n        distancia: { direccion: 'menor', unidad: 'cm' }\n    };\n    var msgs = [];\n    for (var s in persist) {\n        var m = meta[s] || { direccion: 'mayor', unidad: '' };\n        msgs.push({\n            topic: 'smarthome/equipo2/umbrales/' + s,\n            payload: JSON.stringify({ limite: persist[s], direccion: m.direccion, unidad: m.unidad }),\n            retain: true\n        });\n    }\n    if (!msgs.length) return null;\n    node.status({ fill: 'green', shape: 'dot', text: msgs.length + ' umbrales restaurados' });\n    return [msgs];\n} catch (e) { return null; }\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 580,
+        "y": 460,
+        "wires": [
+            [
+                "gemelo.umbrales.restore.mqtt"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.umbrales.restore.mqtt",
+        "type": "mqtt out",
+        "z": "gemelo.digital",
+        "name": "Republicar umbral (retenido)",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "367352e091ce6828",
+        "x": 860,
+        "y": 460,
         "wires": []
     }
 ]
