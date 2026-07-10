@@ -1,11 +1,8 @@
 #include <SPI.h>
 #include <WiFi101.h>
 #include <PubSubClient.h>
-#include <hd44780.h>
-#include <hd44780ioClass/hd44780_pinIO.h>
-
-// LCD JHD 162A modo 4-bit: RS=5, E=7, D4=2, D5=3, D6=8, D7=9
-hd44780_pinIO lcd(5, 7, 2, 3, 8, 9);
+#include <WiFiUDP.h>
+#include <coap-simple.h>
 
 // CONFIGURACION DE WI-FI Y MQTT
 const char* ssid = "Segundo";//"iPhoneTintin";
@@ -19,6 +16,12 @@ const char* mqtt_pass = "mkr1000_iot";
 
 WiFiClient mkrClient;
 PubSubClient client(mkrClient);
+
+WiFiUDP udp;
+Coap coap(udp);
+
+const char* coap_host = "192.168.1.10";
+const int coap_port = 5683;
 
 // PINES SENSORES Y LED
 const int pinMaxBotix = A0;
@@ -58,13 +61,13 @@ unsigned long lastMsg = 0;
 const long interval = 2000;
 
 void setup_wifi() {
-  lcd.setCursor(0, 1);
-  lcd.print("Conectando WiFi ");
-  delay(10);
+  Serial.print("Conectando WiFi");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
+    Serial.print(".");
   }
+  Serial.println(" OK");
 }
 
 void mqttCallback(char* topic, byte* payload, unsigned int length) {
@@ -83,51 +86,21 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
 
 void reconnect() {
   while (!client.connected()) {
-    lcd.clear();
-    lcd.print("Reconectando...");
+    Serial.println("Reconectando MQTT...");
     String clientId = "MKR1000Client-" + String(random(0, 1000));
     if (client.connect(clientId.c_str(), mqtt_user, mqtt_pass)) {
       client.subscribe(topicLedSet);
       client.publish(topicLedState, estadoLED ? "ON" : "OFF");
+      Serial.println("MQTT reconectado");
     } else {
       delay(5000);
     }
   }
 }
 
-void mostrarAlarmaLCD(float distanciaCm, int valorCO2, int porcentajeSonido) {
-  bool alarmaDist   = distanciaCm < UMBRAL_DIST;
-  bool alarmaCO2    = valorCO2    > UMBRAL_CO2;
-  bool alarmaSonido = porcentajeSonido > UMBRAL_SONIDO;
-  bool hayAlarma    = alarmaDist || alarmaCO2 || alarmaSonido;
-
-  if (!hayAlarma) return;  // LCD apagada/sin cambios si no hay alarma
-
-  lcd.clear();
-
-  lcd.setCursor(0, 0);
-  lcd.print("D:");
-  lcd.print(distanciaCm, 1);
-  lcd.print(" CO2:");
-  lcd.print(valorCO2);
-
-  lcd.setCursor(0, 1);
-  if (alarmaDist)   lcd.print("!DIST ");
-  if (alarmaCO2)    lcd.print("!GAS ");
-  if (alarmaSonido) lcd.print("!SND");
-}
+void callbackCoapResp(CoapPacket &packet, IPAddress ip, int port) {}
 
 void setup() {
-  pinMode(5, OUTPUT);
-  pinMode(7, OUTPUT);
-  pinMode(2, OUTPUT);
-  pinMode(3, OUTPUT);
-  pinMode(8, OUTPUT);
-  pinMode(9, OUTPUT);
-
-  lcd.begin(16, 2);
-  lcd.print("Iniciando...");
-
   Serial.begin(9600);
   pinMode(pinLED, OUTPUT);
   digitalWrite(pinLED, LOW);
@@ -141,8 +114,9 @@ void setup() {
 
   setup_wifi();
 
-  lcd.clear();
-  lcd.print("WiFi OK");
+  coap.response(callbackCoapResp);
+  coap.start();
+  Serial.println("CoAP iniciado");
 
   client.setServer(mqtt_server, mqtt_port);
   client.setBufferSize(512);
@@ -152,6 +126,7 @@ void setup() {
 void loop() {
   if (!client.connected()) reconnect();
   client.loop();
+  coap.loop();
 
   if (estadoLEDCambio) {
     client.publish(topicLedState, estadoLED ? "ON" : "OFF");
@@ -208,20 +183,25 @@ void loop() {
     Serial.print("\t| CO2: "); Serial.print(valorCO2);
     Serial.print("\t| Sonido: "); Serial.println(porcentajeSonido);
 
-    // 6. ACTUALIZAR LCD (solo si hay alarma)
-    mostrarAlarmaLCD(distanciaCm, valorCO2, porcentajeSonido);
-
-    // 7. PUBLICAR TOPICS
+    // 6. PUBLICAR TOPICS
     client.publish(topicCO2,       String(valorCO2).c_str());
     client.publish(topicSonido,    String(porcentajeSonido).c_str());
     client.publish(topicDistancia, String(distanciaCm, 1).c_str());
 
-    // 8. JSON COMBINADO
+    // 7. JSON COMBINADO
     String payload = "{";
     payload += "\"distancia\": " + String(distanciaCm) + ", ";
     payload += "\"co2\": " + String(valorCO2) + ", ";
     payload += "\"sonido\": " + String(porcentajeSonido);
     payload += "}";
     client.publish(topicAlerta, payload.c_str());
+
+    // 8. COAP - enviar datos al bridge
+    String jsonCO2 = "{\"valor\": " + String(valorCO2) + ", \"tipo\": \"co2\"}";
+    String jsonSonido = "{\"valor\": " + String(porcentajeSonido) + ", \"tipo\": \"sonido\"}";
+    String jsonDist = "{\"valor\": " + String(distanciaCm, 1) + ", \"tipo\": \"distancia\"}";
+    coap.put(IPAddress(192, 168, 1, 10), coap_port, "/distancia", jsonDist.c_str());
+    coap.put(IPAddress(192, 168, 1, 10), coap_port, "/co2", jsonCO2.c_str());
+    coap.put(IPAddress(192, 168, 1, 10), coap_port, "/sonido", jsonSonido.c_str());
   }
 }
