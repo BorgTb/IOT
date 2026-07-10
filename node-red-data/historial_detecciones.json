@@ -1,1 +1,14 @@
-[]
+[
+  {
+    "nombre": "test",
+    "reconocida": true,
+    "timestamp": "2026-07-10T05:52:33.602Z",
+    "hora": "10-07-2026, 1:52:33 a. m."
+  },
+  {
+    "nombre": "test",
+    "reconocida": true,
+    "timestamp": "2026-07-10T06:05:15.021Z",
+    "hora": "10-07-2026, 2:05:15 a. m."
+  }
+]
