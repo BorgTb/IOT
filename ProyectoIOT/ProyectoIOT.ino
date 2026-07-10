@@ -5,9 +5,9 @@
 #include <coap-simple.h>
 
 // CONFIGURACION DE WI-FI Y MQTT
-const char* ssid = "Segundo";//"iPhoneTintin";
-const char* password = "97710563";//"agu12355";
-const char* mqtt_server = "192.168.1.10";//"172.20.10.3";
+const char* ssid = "iPhoneTintin";
+const char* password = "agu12355";
+const char* mqtt_server = "172.20.10.4";
 const int mqtt_port = 1883;
 
 // CREDENCIALES MQTT
