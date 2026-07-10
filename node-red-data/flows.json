@@ -807,7 +807,7 @@
         "type": "ui_text_input",
         "z": "gemelo.consulta.natural",
         "name": "Pregunta al sistema",
-        "label": "Pregunta al sistema:",
+        "label": "Pregunta (Enter para enviar)",
         "tooltip": "Escribe una pregunta sobre el estado del hogar",
         "group": "gemelo.ui.group",
         "order": 1,
@@ -815,7 +815,7 @@
         "height": 0,
         "passthru": true,
         "mode": "text",
-        "delay": 500,
+        "delay": 0,
         "topic": "consulta_natural",
         "x": 130,
         "y": 80,
@@ -823,7 +823,8 @@
             [
                 "gemelo.umbral.detect"
             ]
-        ]
+        ],
+        "sendOnBlur": false
     },
     {
         "id": "gemelo.umbral.detect",
@@ -2142,5 +2143,297 @@
         "x": 860,
         "y": 460,
         "wires": []
+    },
+    {
+        "id": "monitor.tab",
+        "type": "tab",
+        "label": "Monitor Sensores",
+        "disabled": false,
+        "info": "Suscripcion directa a los topicos de sensores: valores en vivo + grafico del sensor elegido."
+    },
+    {
+        "id": "monitor.ui.tab",
+        "type": "ui_tab",
+        "name": "Monitor",
+        "icon": "show_chart",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "monitor.ui.g1",
+        "type": "ui_group",
+        "name": "Valores actuales",
+        "tab": "monitor.ui.tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "monitor.ui.g2",
+        "type": "ui_group",
+        "name": "Grafico del sensor",
+        "tab": "monitor.ui.tab",
+        "order": 2,
+        "disp": true,
+        "width": "8",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "monitor.mqtt.in",
+        "type": "mqtt in",
+        "z": "monitor.tab",
+        "name": "Sensores equipo2",
+        "topic": "smarthome/equipo2/alerta",
+        "qos": "1",
+        "datatype": "utf8",
+        "broker": "367352e091ce6828",
+        "inputs": 0,
+        "x": 140,
+        "y": 120,
+        "wires": [
+            [
+                "monitor.parse"
+            ]
+        ]
+    },
+    {
+        "id": "monitor.parse",
+        "type": "json",
+        "z": "monitor.tab",
+        "name": "Parsear JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 330,
+        "y": 120,
+        "wires": [
+            [
+                "monitor.norm"
+            ]
+        ]
+    },
+    {
+        "id": "monitor.norm",
+        "type": "function",
+        "z": "monitor.tab",
+        "name": "Repartir valores",
+        "func": "// Normaliza el payload de sensores y reparte a los gauges + grafico\nvar d = msg.payload || {};\nvar co2 = d.co2 !== undefined ? d.co2 : d.gas;\nvar sonido = d.sonido;\nvar dist = d.distancia;\n\nvar sel = flow.get('sensor_sel') || 'co2';\nvar valores = { co2: co2, sonido: sonido, distancia: dist };\nvar mChart = null;\nif (valores[sel] !== undefined && valores[sel] !== null) {\n    mChart = { payload: Number(valores[sel]), topic: sel };\n}\nnode.status({ fill: 'green', shape: 'dot', text: 'co2:' + co2 + ' son:' + sonido + ' dist:' + dist });\nreturn [\n    co2    !== undefined ? { payload: Number(co2) }    : null,\n    sonido !== undefined ? { payload: Number(sonido) } : null,\n    dist   !== undefined ? { payload: Number(dist) }   : null,\n    mChart\n];\n",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 530,
+        "y": 120,
+        "wires": [
+            [
+                "monitor.ui.gauge.co2"
+            ],
+            [
+                "monitor.ui.gauge.sonido"
+            ],
+            [
+                "monitor.ui.gauge.dist"
+            ],
+            [
+                "monitor.ui.chart"
+            ]
+        ]
+    },
+    {
+        "id": "monitor.ui.gauge.co2",
+        "type": "ui_gauge",
+        "z": "monitor.tab",
+        "name": "CO2",
+        "group": "monitor.ui.g1",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "CO2 (MQ7)",
+        "label": "ppm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "1000",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "400",
+        "seg2": "600",
+        "diff": false,
+        "className": "",
+        "x": 760,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "monitor.ui.gauge.sonido",
+        "type": "ui_gauge",
+        "z": "monitor.tab",
+        "name": "Sonido",
+        "group": "monitor.ui.g1",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Sonido",
+        "label": "dB",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "120",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "80",
+        "seg2": "100",
+        "diff": false,
+        "className": "",
+        "x": 770,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "monitor.ui.gauge.dist",
+        "type": "ui_gauge",
+        "z": "monitor.tab",
+        "name": "Distancia",
+        "group": "monitor.ui.g1",
+        "order": 3,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Distancia",
+        "label": "cm",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "200",
+        "colors": [
+            "#ca3838",
+            "#e6e600",
+            "#00b500"
+        ],
+        "seg1": "20",
+        "seg2": "50",
+        "diff": false,
+        "className": "",
+        "x": 780,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "monitor.ui.selector",
+        "type": "ui_dropdown",
+        "z": "monitor.tab",
+        "name": "Sensor a graficar",
+        "label": "Sensor",
+        "tooltip": "Elige que sensor graficar",
+        "place": "Selecciona un sensor",
+        "group": "monitor.ui.g2",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "multiple": false,
+        "options": [
+            {
+                "label": "CO2 (MQ7)",
+                "value": "co2",
+                "type": "str"
+            },
+            {
+                "label": "Sonido",
+                "value": "sonido",
+                "type": "str"
+            },
+            {
+                "label": "Distancia",
+                "value": "distancia",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "topic",
+        "topicType": "msg",
+        "className": "",
+        "x": 150,
+        "y": 220,
+        "wires": [
+            [
+                "monitor.sel.store"
+            ]
+        ]
+    },
+    {
+        "id": "monitor.sel.store",
+        "type": "function",
+        "z": "monitor.tab",
+        "name": "Guardar seleccion",
+        "func": "// Guarda el sensor elegido y limpia el grafico para empezar la serie nueva\nflow.set('sensor_sel', msg.payload || 'co2');\nnode.status({ fill: 'blue', shape: 'dot', text: 'graficando: ' + msg.payload });\nreturn { payload: [] };\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 370,
+        "y": 220,
+        "wires": [
+            [
+                "monitor.ui.chart"
+            ]
+        ]
+    },
+    {
+        "id": "monitor.ui.chart",
+        "type": "ui_chart",
+        "z": "monitor.tab",
+        "name": "Grafico sensor",
+        "group": "monitor.ui.g2",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "label": "Serie en tiempo real",
+        "chartType": "line",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "Esperando datos...",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": "10",
+        "removeOlderPoints": "300",
+        "removeOlderUnit": "60",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 770,
+        "y": 240,
+        "wires": [
+            []
+        ]
     }
 ]

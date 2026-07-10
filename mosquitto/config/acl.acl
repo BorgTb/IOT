@@ -23,3 +23,8 @@ topic write smarthome/equipo2/temperatura
 topic write smarthome/equipo2/humedad
 topic read smarthome/equipo2/temperatura
 topic read smarthome/equipo2/humedad
+
+user display
+topic read smarthome/equipo2/alerta
+topic read smarthome/equipo2/llm/decision
+topic read smarthome/equipo2/umbrales/#
