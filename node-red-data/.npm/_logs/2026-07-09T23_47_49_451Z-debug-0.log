@@ -1,0 +1,18 @@
+0 verbose cli /usr/local/bin/node /usr/src/node-red/node_modules/.bin/npm
+1 info using npm@10.9.8
+2 info using node@v20.20.2
+3 silly config load:file:/usr/src/node-red/node_modules/npm/npmrc
+4 silly config load:file:/usr/src/node-red/.npmrc
+5 silly config load:file:/usr/local/etc/npmrc
+6 verbose title npm list @flowfuse/node-red-dashboard
+7 verbose argv "list" "@flowfuse/node-red-dashboard"
+8 verbose logfile logs-max:10 dir:/data/.npm/_logs/2026-07-09T23_47_49_451Z-
+9 verbose logfile /data/.npm/_logs/2026-07-09T23_47_49_451Z-debug-0.log
+10 silly logfile done cleaning log files
+11 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+12 verbose cwd /usr/src/node-red
+13 verbose os Linux 5.15.167.4-microsoft-standard-WSL2
+14 verbose node v20.20.2
+15 verbose npm  v10.9.8
+16 verbose exit 0
+17 info ok

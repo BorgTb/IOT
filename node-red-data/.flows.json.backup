@@ -12,27 +12,16 @@
         "disabled": false
     },
     {
-        "id": "367352e091ce6828",
-        "type": "mqtt-broker",
-        "name": "MQTT Seguro",
-        "broker": "mosquitto",
-        "port": "8883",
-        "clientid": "nodered_llm",
-        "autoConnect": true,
-        "usetls": true,
-        "tls": "gemelo.tls.config",
-        "protocolVersion": "4",
-        "keepalive": "60",
-        "cleansession": true,
-        "birthTopic": "",
-        "birthQos": "0",
-        "birthPayload": "",
-        "closeTopic": "",
-        "closeQos": "0",
-        "closePayload": "",
-        "willTopic": "",
-        "willQos": "0",
-        "willPayload": ""
+        "id": "coap.tab",
+        "type": "tab",
+        "label": "Camara -> Persona",
+        "disabled": false
+    },
+    {
+        "id": "fb521be7f51074da",
+        "type": "tab",
+        "label": "Alertas + Control LED",
+        "disabled": false
     },
     {
         "id": "gemelo.tls.config",
@@ -44,7 +33,6 @@
         "certname": "",
         "keyname": "",
         "caname": "",
-        "cafile": "/certs/ca.crt",
         "servername": "mosquitto",
         "verifyservercert": false
     },
@@ -161,6 +149,66 @@
                 "py": 0
             }
         }
+    },
+    {
+        "id": "367352e091ce6828",
+        "type": "mqtt-broker",
+        "name": "MQTT Seguro",
+        "broker": "mosquitto",
+        "port": "8883",
+        "tls": "gemelo.tls.config",
+        "clientid": "nodered_llm",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": ""
+    },
+    {
+        "id": "broker.local",
+        "type": "mqtt-broker",
+        "name": "Broker local",
+        "broker": "172.20.10.3",
+        "port": "1883",
+        "clientid": "node-red-alertas",
+        "autoConnect": true,
+        "usetls": false,
+        "keepalive": "60",
+        "cleansession": true
+    },
+    {
+        "id": "bot.telegram",
+        "type": "telegram bot",
+        "botname": "Proyecto1IOT",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "pollinterval": "",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "",
+        "socksusername": "",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbothost": "",
+        "localbotport": "",
+        "publicbotport": "",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
     },
     {
         "id": "gemelo.init",
@@ -491,68 +539,6 @@
         "wires": []
     },
     {
-        "id": "gemelo.ui.input",
-        "type": "ui_text_input",
-        "z": "gemelo.consulta.natural",
-        "name": "Pregunta al sistema",
-        "label": "Pregunta al sistema:",
-        "tooltip": "Escribe una pregunta sobre el estado del hogar",
-        "group": "gemelo.ui.group",
-        "order": 1,
-        "width": 0,
-        "height": 0,
-        "passthru": true,
-        "mode": "text",
-        "delay": 0,
-        "topic": "consulta_natural",
-        "x": 130,
-        "y": 80,
-        "wires": [
-            [
-                "gemelo.umbral.detect"
-            ]
-        ]
-    },
-    {
-        "id": "gemelo.umbral.detect",
-        "type": "function",
-        "z": "gemelo.consulta.natural",
-        "name": "Detectar comando de umbral",
-        "func": "var texto = String(msg.payload || \"\").toLowerCase();\nvar gemelo = global.get(\"gemelo\");\nif (!gemelo) return [null, null];\nif (!gemelo.umbrales) gemelo.umbrales = { co2:{limite:400,direccion:\"mayor\",unidad:\"ppm\"}, sonido:{limite:80,direccion:\"mayor\",unidad:\"dB\"}, distancia:{limite:20,direccion:\"menor\",unidad:\"cm\"} };\n\nvar esComando = /(l[ií]mite|umbral|cr[ií]tic|peligros|establece|pon|deja|cambia|configura|ajusta|fija|setea)/.test(texto);\nvar sensor = null;\nif (/(co2|gas|di[oó]xido|mq7)/.test(texto)) sensor = \"co2\";\nelse if (/(sonido|ruido|decibel)/.test(texto)) sensor = \"sonido\";\nelse if (/(distancia|proximidad|cercan)/.test(texto)) sensor = \"distancia\";\n\nvar m = texto.match(/\\b(\\d+(?:[.,]\\d+)?)\\b/);\nvar valor = m ? parseFloat(m[1].replace(\",\", \".\")) : null;\n\nif (esComando && sensor && valor !== null && !isNaN(valor)) {\n    gemelo.umbrales[sensor].limite = valor;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    var un = gemelo.umbrales[sensor].unidad;\n    var dir = gemelo.umbrales[sensor].direccion === \"menor\" ? \"por debajo de\" : \"por encima de\";\n    var nombre = sensor === \"co2\" ? \"CO2\" : sensor;\n    msg.payload = \"Listo. El limite critico de \" + nombre + \" quedo en \" + valor + \" \" + un + \". A partir de ahora se considera peligroso \" + dir + \" \" + valor + \" \" + un + \".\";\n    node.status({fill:\"blue\",shape:\"dot\",text:nombre + \" = \" + valor});\n    var umbralMsg = { topic: \"smarthome/equipo2/umbrales/\" + sensor, payload: JSON.stringify({ limite: valor, direccion: gemelo.umbrales[sensor].direccion, unidad: un }), retain: true };\n    return [msg, null, umbralMsg];\n}\nreturn [null, msg, null];",
-        "outputs": 3,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 150,
-        "y": 160,
-        "wires": [
-            [
-                "gemelo.consulta.output",
-                "gemelo.mqtt.respuesta"
-            ],
-            [
-                "gemelo.consulta.llm"
-            ],
-            [
-                "gemelo.mqtt.umbral"
-            ]
-        ]
-    },
-    {
-        "id": "gemelo.mqtt.umbral",
-        "type": "mqtt out",
-        "z": "gemelo.consulta.natural",
-        "name": "Publicar umbral (retenido)",
-        "topic": "",
-        "qos": "1",
-        "retain": "true",
-        "broker": "367352e091ce6828",
-        "x": 470,
-        "y": 200,
-        "wires": []
-    },
-    {
         "id": "gemelo.umbrales.in",
         "type": "mqtt in",
         "z": "gemelo.digital",
@@ -588,97 +574,6 @@
         ]
     },
     {
-        "id": "gemelo.consulta.llm",
-        "type": "function",
-        "z": "gemelo.consulta.natural",
-        "name": "Construir consulta + contexto",
-        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 310,
-        "y": 80,
-        "wires": [
-            [
-                "gemelo.consulta.http"
-            ]
-        ]
-    },
-    {
-        "id": "gemelo.consulta.http",
-        "type": "http request",
-        "z": "gemelo.consulta.natural",
-        "name": "POST Ollama",
-        "method": "POST",
-        "ret": "obj",
-        "paytoqs": "body",
-        "url": "http://ollama:11434/api/generate",
-        "tls": "",
-        "persist": false,
-        "proxy": "",
-        "insecureHTTPParser": false,
-        "authType": "",
-        "headers": [],
-        "x": 490,
-        "y": 80,
-        "wires": [
-            [
-                "gemelo.consulta.response"
-            ]
-        ]
-    },
-    {
-        "id": "gemelo.consulta.response",
-        "type": "function",
-        "z": "gemelo.consulta.natural",
-        "name": "Formatear respuesta",
-        "func": "var respuesta = msg.payload?.response || \"No se pudo obtener respuesta\";\nreturn { payload: respuesta };",
-        "outputs": 1,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 670,
-        "y": 80,
-        "wires": [
-            [
-                "gemelo.consulta.output",
-                "gemelo.mqtt.respuesta"
-            ]
-        ]
-    },
-    {
-        "id": "gemelo.mqtt.respuesta",
-        "type": "mqtt out",
-        "z": "gemelo.consulta.natural",
-        "name": "Publicar Respuesta LLM",
-        "topic": "smarthome/equipo2/llm/respuesta",
-        "qos": "0",
-        "retain": "",
-        "broker": "367352e091ce6828",
-        "x": 860,
-        "y": 160,
-        "wires": []
-    },
-    {
-        "id": "gemelo.consulta.output",
-        "type": "ui_text",
-        "z": "gemelo.consulta.natural",
-        "group": "gemelo.ui.group",
-        "order": 2,
-        "width": 0,
-        "height": 0,
-        "name": "Respuesta LLM",
-        "label": "Respuesta:",
-        "format": "{{msg.payload}}",
-        "layout": "row-center",
-        "x": 850,
-        "y": 80,
-        "wires": []
-    },
-    {
         "id": "gemelo.influx.line",
         "type": "function",
         "z": "gemelo.digital",
@@ -711,7 +606,6 @@
         "proxy": "",
         "insecureHTTPParser": false,
         "authType": "",
-        "senderror": false,
         "headers": [],
         "x": 530,
         "y": 460,
@@ -835,7 +729,6 @@
         "proxy": "",
         "insecureHTTPParser": false,
         "authType": "",
-        "senderror": false,
         "headers": [],
         "x": 590,
         "y": 620,
@@ -855,10 +748,157 @@
         "wires": []
     },
     {
-        "id": "coap.tab",
-        "type": "tab",
-        "label": "Camara -> Persona",
-        "disabled": false
+        "id": "gemelo.ui.input",
+        "type": "ui_text_input",
+        "z": "gemelo.consulta.natural",
+        "name": "Pregunta al sistema",
+        "label": "Pregunta al sistema:",
+        "tooltip": "Escribe una pregunta sobre el estado del hogar",
+        "group": "gemelo.ui.group",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": true,
+        "mode": "text",
+        "delay": 0,
+        "topic": "consulta_natural",
+        "x": 130,
+        "y": 80,
+        "wires": [
+            [
+                "gemelo.umbral.detect"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.umbral.detect",
+        "type": "function",
+        "z": "gemelo.consulta.natural",
+        "name": "Detectar comando de umbral",
+        "func": "var texto = String(msg.payload || \"\").toLowerCase();\nvar gemelo = global.get(\"gemelo\");\nif (!gemelo) return [null, null];\nif (!gemelo.umbrales) gemelo.umbrales = { co2:{limite:400,direccion:\"mayor\",unidad:\"ppm\"}, sonido:{limite:80,direccion:\"mayor\",unidad:\"dB\"}, distancia:{limite:20,direccion:\"menor\",unidad:\"cm\"} };\n\nvar esComando = /(l[ií]mite|umbral|cr[ií]tic|peligros|establece|pon|deja|cambia|configura|ajusta|fija|setea)/.test(texto);\nvar sensor = null;\nif (/(co2|gas|di[oó]xido|mq7)/.test(texto)) sensor = \"co2\";\nelse if (/(sonido|ruido|decibel)/.test(texto)) sensor = \"sonido\";\nelse if (/(distancia|proximidad|cercan)/.test(texto)) sensor = \"distancia\";\n\nvar m = texto.match(/\\b(\\d+(?:[.,]\\d+)?)\\b/);\nvar valor = m ? parseFloat(m[1].replace(\",\", \".\")) : null;\n\nif (esComando && sensor && valor !== null && !isNaN(valor)) {\n    gemelo.umbrales[sensor].limite = valor;\n    gemelo.ultimo_update = new Date().toISOString();\n    global.set(\"gemelo\", gemelo);\n    var un = gemelo.umbrales[sensor].unidad;\n    var dir = gemelo.umbrales[sensor].direccion === \"menor\" ? \"por debajo de\" : \"por encima de\";\n    var nombre = sensor === \"co2\" ? \"CO2\" : sensor;\n    msg.payload = \"Listo. El limite critico de \" + nombre + \" quedo en \" + valor + \" \" + un + \". A partir de ahora se considera peligroso \" + dir + \" \" + valor + \" \" + un + \".\";\n    node.status({fill:\"blue\",shape:\"dot\",text:nombre + \" = \" + valor});\n    var umbralMsg = { topic: \"smarthome/equipo2/umbrales/\" + sensor, payload: JSON.stringify({ limite: valor, direccion: gemelo.umbrales[sensor].direccion, unidad: un }), retain: true };\n    return [msg, null, umbralMsg];\n}\nreturn [null, msg, null];",
+        "outputs": 3,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 150,
+        "y": 160,
+        "wires": [
+            [
+                "gemelo.consulta.output",
+                "gemelo.mqtt.respuesta"
+            ],
+            [
+                "gemelo.consulta.llm"
+            ],
+            [
+                "gemelo.mqtt.umbral"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.mqtt.umbral",
+        "type": "mqtt out",
+        "z": "gemelo.consulta.natural",
+        "name": "Publicar umbral (retenido)",
+        "topic": "",
+        "qos": "1",
+        "retain": "true",
+        "broker": "367352e091ce6828",
+        "x": 470,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "gemelo.consulta.llm",
+        "type": "function",
+        "z": "gemelo.consulta.natural",
+        "name": "Construir consulta + contexto",
+        "func": "var gemelo = global.get(\"gemelo\");\nif (!gemelo) return null;\n\nvar e = gemelo.estado_actual;\nvar pregunta = msg.payload || \"\";\nif (!pregunta) return null;\n\nvar contexto = \"Datos actuales de los sensores de la casa:\\n\";\ncontexto += \"- CO2 (sensor MQ7): \" + e.co2 + \" ppm\\n\";\ncontexto += \"- Distancia (ultrasonico): \" + e.distancia + \" cm\\n\";\ncontexto += \"- Nivel de sonido: \" + e.sonido + \" dB\\n\";\ncontexto += \"- Persona detectada por la camara: \" + (e.persona ? (\"Si\" + (e.persona_nombre ? \", identificada como \" + e.persona_nombre : \", desconocida\")) : \"No\") + \"\\n\";\ncontexto += \"- LED: \" + (e.led ? \"Encendido\" : \"Apagado\") + \"\\n\\n\";\nvar u = gemelo.umbrales;\nif (u) {\n    contexto += \"Umbrales criticos configurados (se considera peligroso al superarlos):\\n\";\n    contexto += \"- CO2: mayor a \" + u.co2.limite + \" ppm\\n\";\n    contexto += \"- Sonido: mayor a \" + u.sonido.limite + \" dB\\n\";\n    contexto += \"- Distancia: menor a \" + u.distancia.limite + \" cm\\n\\n\";\n}\ncontexto += \"Pregunta del usuario: \" + pregunta;\n\nreturn {\n    payload: {\n        model: \"llama3.2:3b\",\n        system: \"Eres el asistente de una casa inteligente. Responde SIEMPRE en espanol, de forma breve, clara y precisa, usando solo los datos de sensores proporcionados. No inventes valores que no esten en el contexto.\",\n        prompt: contexto,\n        stream: false\n    }\n};",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 80,
+        "wires": [
+            [
+                "gemelo.consulta.http"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.consulta.http",
+        "type": "http request",
+        "z": "gemelo.consulta.natural",
+        "name": "POST Ollama",
+        "method": "POST",
+        "ret": "obj",
+        "paytoqs": "body",
+        "url": "http://ollama:11434/api/generate",
+        "tls": "",
+        "persist": false,
+        "proxy": "",
+        "insecureHTTPParser": false,
+        "authType": "",
+        "headers": [],
+        "x": 490,
+        "y": 80,
+        "wires": [
+            [
+                "gemelo.consulta.response"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.consulta.response",
+        "type": "function",
+        "z": "gemelo.consulta.natural",
+        "name": "Formatear respuesta",
+        "func": "var respuesta = msg.payload?.response || \"No se pudo obtener respuesta\";\nreturn { payload: respuesta };",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 80,
+        "wires": [
+            [
+                "gemelo.consulta.output",
+                "gemelo.mqtt.respuesta"
+            ]
+        ]
+    },
+    {
+        "id": "gemelo.mqtt.respuesta",
+        "type": "mqtt out",
+        "z": "gemelo.consulta.natural",
+        "name": "Publicar Respuesta LLM",
+        "topic": "smarthome/equipo2/llm/respuesta",
+        "qos": "0",
+        "retain": "",
+        "broker": "367352e091ce6828",
+        "x": 860,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "gemelo.consulta.output",
+        "type": "ui_text",
+        "z": "gemelo.consulta.natural",
+        "group": "gemelo.ui.group",
+        "order": 2,
+        "width": 0,
+        "height": 0,
+        "name": "Respuesta LLM",
+        "label": "Respuesta:",
+        "format": "{{msg.payload}}",
+        "layout": "row-center",
+        "x": 850,
+        "y": 80,
+        "wires": []
     },
     {
         "id": "cam.tick",
@@ -918,7 +958,6 @@
         "proxy": "",
         "insecureHTTPParser": false,
         "authType": "",
-        "senderror": false,
         "headers": [],
         "x": 500,
         "y": 320,
@@ -961,7 +1000,6 @@
         "proxy": "",
         "insecureHTTPParser": false,
         "authType": "",
-        "senderror": false,
         "headers": [],
         "x": 910,
         "y": 320,
@@ -1003,5 +1041,180 @@
         "x": 510,
         "y": 380,
         "wires": []
+    },
+    {
+        "id": "6314799547cb00e2",
+        "type": "mqtt in",
+        "z": "fb521be7f51074da",
+        "name": "Sensores MKR1000",
+        "topic": "smarthome/equipo2/alerta",
+        "qos": "2",
+        "datatype": "utf8",
+        "broker": "367352e091ce6828",
+        "inputs": 0,
+        "x": 140,
+        "y": 120,
+        "wires": [
+            [
+                "46e07d62e61c1554"
+            ]
+        ]
+    },
+    {
+        "id": "46e07d62e61c1554",
+        "type": "json",
+        "z": "fb521be7f51074da",
+        "name": "Parsear JSON",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 320,
+        "y": 120,
+        "wires": [
+            [
+                "46d0b9e4a57cb01f"
+            ]
+        ]
+    },
+    {
+        "id": "46d0b9e4a57cb01f",
+        "type": "function",
+        "z": "fb521be7f51074da",
+        "name": "Verificar umbrales",
+        "func": "const d = msg.payload;\nconst cooldown = 60000;\nconst now = Date.now();\nlet alerts = [];\n\nconst gemelo = global.get('gemelo');\nconst u = (gemelo && gemelo.umbrales) || {\n    co2: { limite: 400 },\n    sonido: { limite: 80 },\n    distancia: { limite: 20 }\n};\n\nif (d.distancia < u.distancia.limite) {\n    const last = context.get('d_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Distancia crítica!*\\nObjeto a ' + Number(d.distancia).toFixed(1) + ' cm (límite: ' + u.distancia.limite + ' cm)');\n        context.set('d_alert', now);\n    }\n}\nif (d.co2 > u.co2.limite) {\n    const last = context.get('g_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Nivel de CO2 elevado!*\\nValor: ' + d.co2 + ' ppm (límite: ' + u.co2.limite + ' ppm)');\n        context.set('g_alert', now);\n    }\n}\nif (d.sonido > u.sonido.limite) {\n    const last = context.get('s_alert') || 0;\n    if (now - last > cooldown) {\n        alerts.push('⚠️ *Ruido excesivo!*\\n' + d.sonido + '% (límite: ' + u.sonido.limite + '%)');\n        context.set('s_alert', now);\n    }\n}\nif (alerts.length > 0) {\n    msg.payload = {\n        chatId: '1138232122',\n        type: 'message',\n        content: '🚨 *ALERTA ESTACIÓN IOT*\\n\\n' + alerts.join('\\n\\n')\n    };\n    return msg;\n}\nreturn null;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 510,
+        "y": 120,
+        "wires": [
+            [
+                "8adf24978d9ceaea"
+            ]
+        ]
+    },
+    {
+        "id": "8adf24978d9ceaea",
+        "type": "telegram sender",
+        "z": "fb521be7f51074da",
+        "name": "Enviar alerta",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 710,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "87f8c3c6a94a062b",
+        "type": "telegram command",
+        "z": "fb521be7f51074da",
+        "name": "Comando /led",
+        "command": "/led",
+        "bot": "bot.telegram",
+        "strict": false,
+        "hasresponse": false,
+        "useregex": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "032cfb6d6ad98096"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "032cfb6d6ad98096",
+        "type": "function",
+        "z": "fb521be7f51074da",
+        "name": "Mapear comando LED",
+        "func": "const chatId = msg.payload.chatId || '1138232122';\nconst cmd = String(msg.payload.content || '').trim().toUpperCase();\n\nlet accion = '';\nif (cmd === 'ON' || cmd === '1')           accion = 'ON';\nelse if (cmd === 'OFF' || cmd === '0')    accion = 'OFF';\nelse if (cmd === 'TOGGLE' || cmd === 'T') accion = 'TOGGLE';\nelse {\n    return [null, {\n        payload: { chatId: chatId, type: 'message', content: '❌ Usá: /led ON, /led OFF o /led TOGGLE' }\n    }];\n}\n\nreturn [\n    { payload: accion },                                        // Output 1 → MQTT\n    { payload: { chatId: chatId, type: 'message', content: '✅ LED ' + accion } }  // Output 2 → Telegram\n];",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 350,
+        "y": 280,
+        "wires": [
+            [
+                "ddebb9f1ba728a32"
+            ],
+            [
+                "7bab4ab11061160f"
+            ]
+        ]
+    },
+    {
+        "id": "ddebb9f1ba728a32",
+        "type": "mqtt out",
+        "z": "fb521be7f51074da",
+        "name": "Publicar comando",
+        "topic": "smarthome/equipo2/control/led",
+        "qos": "1",
+        "retain": false,
+        "broker": "367352e091ce6828",
+        "x": 570,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "7bab4ab11061160f",
+        "type": "telegram sender",
+        "z": "fb521be7f51074da",
+        "name": "Confirmar comando",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 570,
+        "y": 310,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "def0fad6f92c2dc0",
+        "type": "mqtt in",
+        "z": "fb521be7f51074da",
+        "name": "Estado del LED",
+        "topic": "smarthome/equipo2/led/state",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "367352e091ce6828",
+        "inputs": 0,
+        "x": 140,
+        "y": 400,
+        "wires": [
+            [
+                "268ba9491b619f98"
+            ]
+        ]
+    },
+    {
+        "id": "268ba9491b619f98",
+        "type": "function",
+        "z": "fb521be7f51074da",
+        "name": "Notificar estado LED",
+        "func": "const estado = String(msg.payload).toUpperCase();\nconst icono = estado === 'ON' ? '🟢' : '🔴';\nmsg.payload = {\n    chatId: '1138232122',\n    type: 'message',\n    content: icono + ' LED ' + (estado === 'ON' ? 'ENCENDIDO' : 'APAGADO')\n};\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 340,
+        "y": 400,
+        "wires": [
+            [
+                "28d777557f85eca3"
+            ]
+        ]
+    },
+    {
+        "id": "28d777557f85eca3",
+        "type": "telegram sender",
+        "z": "fb521be7f51074da",
+        "name": "Notificar Telegram",
+        "bot": "bot.telegram",
+        "outputs": 1,
+        "x": 550,
+        "y": 400,
+        "wires": [
+            []
+        ]
     }
 ]
